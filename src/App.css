@@ -1,5 +1,7 @@
 .app {
-  min-height: 100vh;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   background: #f3f4f6;
 }
 
@@ -7,8 +9,10 @@
   background: #3b82f6;
   color: white;
   padding: 16px 20px;
-  position: sticky;
-  top: 0;
+  padding-top: calc(16px + var(--safe-area-top, 0px));
+  padding-left: calc(20px + var(--safe-area-left, 0px));
+  padding-right: calc(20px + var(--safe-area-right, 0px));
+  flex-shrink: 0;
   z-index: 100;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -20,16 +24,26 @@
 }
 
 .app-main {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 16px;
+  padding-left: calc(16px + var(--safe-area-left, 0px));
+  padding-right: calc(16px + var(--safe-area-right, 0px));
+  padding-bottom: calc(100px + var(--safe-area-bottom, 0px));
+}
+
+.app-main > * {
   max-width: 600px;
-  margin: 0 auto;
-  padding-bottom: 100px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .fab {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  bottom: calc(24px + var(--safe-area-bottom, 0px));
+  right: calc(24px + var(--safe-area-right, 0px));
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -43,15 +57,18 @@
   justify-content: center;
   transition: transform 0.2s, background-color 0.2s;
   z-index: 99;
+  /* iOS: タッチフィードバック改善 */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .fab:hover {
   background: #2563eb;
-  transform: scale(1.05);
 }
 
 .fab:active {
   transform: scale(0.95);
+  background: #1d4ed8;
 }
 
 .fab svg {
@@ -62,6 +79,9 @@
 @media (max-width: 480px) {
   .app-header {
     padding: 14px 16px;
+    padding-top: calc(14px + var(--safe-area-top, 0px));
+    padding-left: calc(16px + var(--safe-area-left, 0px));
+    padding-right: calc(16px + var(--safe-area-right, 0px));
   }
 
   .app-header h1 {
@@ -70,12 +90,14 @@
 
   .app-main {
     padding: 12px;
-    padding-bottom: 100px;
+    padding-left: calc(12px + var(--safe-area-left, 0px));
+    padding-right: calc(12px + var(--safe-area-right, 0px));
+    padding-bottom: calc(100px + var(--safe-area-bottom, 0px));
   }
 
   .fab {
-    bottom: 20px;
-    right: 20px;
+    bottom: calc(20px + var(--safe-area-bottom, 0px));
+    right: calc(20px + var(--safe-area-right, 0px));
     width: 52px;
     height: 52px;
   }
@@ -84,16 +106,13 @@
 @media (min-width: 768px) {
   .app-main {
     padding: 24px;
-    padding-bottom: 100px;
+    padding-bottom: calc(100px + var(--safe-area-bottom, 0px));
   }
 }
 
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .app-main {
-    padding-bottom: calc(100px + env(safe-area-inset-bottom));
-  }
-
-  .fab {
-    bottom: calc(24px + env(safe-area-inset-bottom));
+/* iOS スタンドアロンモード */
+@media (display-mode: standalone) {
+  .app-header {
+    padding-top: calc(16px + var(--safe-area-top, 0px));
   }
 }
