@@ -2,6 +2,7 @@ import type { Schedule } from '../types/schedule';
 
 const STORAGE_KEY = 'schedule-app-data';
 
+// localStorageからスケジュールをロード
 export function loadSchedules(): Schedule[] {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
@@ -14,6 +15,7 @@ export function loadSchedules(): Schedule[] {
   return [];
 }
 
+// localStorageにスケジュールを保存
 export function saveSchedules(schedules: Schedule[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(schedules));

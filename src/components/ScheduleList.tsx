@@ -9,6 +9,7 @@ interface ScheduleListProps {
   onDelete: (id: string) => void;
 }
 
+// 予定一覧
 export function ScheduleList({ schedules, selectedDate, onEdit, onDelete }: ScheduleListProps) {
   const filteredSchedules = schedules
     .filter(s => s.date === selectedDate)
@@ -24,10 +25,7 @@ export function ScheduleList({ schedules, selectedDate, onEdit, onDelete }: Sche
         <ul className="schedules">
           {filteredSchedules.map(schedule => (
             <li key={schedule.id} className="schedule-item">
-              <div
-                className="schedule-color-bar"
-                style={{ backgroundColor: schedule.color }}
-              />
+              <div className="schedule-color-bar" style={{ backgroundColor: schedule.color }} />
               <div className="schedule-content">
                 <div className="schedule-time">
                   {schedule.startTime} - {schedule.endTime}
