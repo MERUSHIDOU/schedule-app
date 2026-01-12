@@ -25,3 +25,8 @@ dist-ssr
 
 # Claude Code local settings
 .claude/settings.local.json
+.mcp.json
+
+# Environment variables
+.env
+.env.local
