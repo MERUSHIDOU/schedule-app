@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Schedule, ScheduleFormData } from '../types/schedule';
-import { loadSchedules, saveSchedules, generateId } from '../utils/storage';
+import { loadSchedules, saveSchedules, generateId, hasStorageData } from '../utils/storage';
 
 // スケジュールデータのCRUD
 export function useSchedules() {
@@ -11,7 +11,7 @@ export function useSchedules() {
   }, []);
 
   useEffect(() => {
-    if (schedules.length > 0 || localStorage.getItem('schedule-app-data')) {
+    if (schedules.length > 0 || hasStorageData()) {
       saveSchedules(schedules);
     }
   }, [schedules]);
