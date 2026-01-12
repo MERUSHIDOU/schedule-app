@@ -18,7 +18,7 @@ const COLORS = [
   '#8b5cf6',
   '#ec4899',
   '#06b6d4',
-  '#84cc16'
+  '#84cc16',
 ];
 
 const initialFormData: ScheduleFormData = {
@@ -27,32 +27,35 @@ const initialFormData: ScheduleFormData = {
   date: '',
   startTime: '09:00',
   endTime: '10:00',
-  color: COLORS[0]
+  color: COLORS[0],
 };
 
+// スケジュール編集フォーム
 export function ScheduleForm({
   isOpen,
   schedule,
   selectedDate,
   onClose,
-  onSubmit
+  onSubmit,
 }: ScheduleFormProps) {
   const [formData, setFormData] = useState<ScheduleFormData>(initialFormData);
 
   useEffect(() => {
     if (schedule) {
+      // 新規作成
       setFormData({
         title: schedule.title,
         description: schedule.description,
         date: schedule.date,
         startTime: schedule.startTime,
         endTime: schedule.endTime,
-        color: schedule.color
+        color: schedule.color,
       });
     } else {
+      // 編集
       setFormData({
         ...initialFormData,
-        date: selectedDate
+        date: selectedDate,
       });
     }
   }, [schedule, selectedDate, isOpen]);
@@ -64,9 +67,7 @@ export function ScheduleForm({
     onClose();
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };

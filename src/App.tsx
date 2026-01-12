@@ -13,22 +13,26 @@ function App() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
 
+  // 予定追加ボタンを押したとき
   const handleAddClick = () => {
     setEditingSchedule(null);
     setIsFormOpen(true);
   };
 
+  // 既存スケジュールの編集ボタン押したとき
   const handleEdit = (schedule: Schedule) => {
     setEditingSchedule(schedule);
     setIsFormOpen(true);
   };
 
+  // 既存スケジュールの削除ボタンを押したとき
   const handleDelete = (id: string) => {
     if (window.confirm('この予定を削除しますか？')) {
       deleteSchedule(id);
     }
   };
 
+  // スケジュール作成フォームで追加ボタンを押したとき
   const handleFormSubmit = (data: ScheduleFormData) => {
     if (editingSchedule) {
       updateSchedule(editingSchedule.id, data);
@@ -37,6 +41,7 @@ function App() {
     }
   };
 
+  // スケジュール作成フォームで閉じるボタンを押したとき
   const handleFormClose = () => {
     setIsFormOpen(false);
     setEditingSchedule(null);

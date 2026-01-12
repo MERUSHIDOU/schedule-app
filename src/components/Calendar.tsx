@@ -11,25 +11,34 @@ interface CalendarProps {
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
+// 月間カレンダー表示
 export function Calendar({ schedules, selectedDate, onSelectDate }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const days = getMonthDays(year, month);
 
+  // < 先月へ戻る
   const goToPrevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
   };
 
+  // > 来月へ飛ぶ
   const goToNextMonth = () => {
     setCurrentDate(new Date(year, month + 1, 1));
   };
 
+  // 今日へ飛ぶ
   const goToToday = () => {
     setCurrentDate(new Date());
     onSelectDate(formatDate(new Date()));
   };
 
+  /**
+   * 指定された日付のスケジュールを取得
+   * @param date
+   * @returns
+   */
   const getSchedulesForDay = (date: Date) => {
     return schedules.filter(s => s.date === formatDate(date));
   };

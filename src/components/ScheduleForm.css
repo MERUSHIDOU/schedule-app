@@ -86,7 +86,9 @@ form {
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 16px; /* iOS: ズーム防止 */
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   -webkit-appearance: none;
   appearance: none;
   background: #fff;
@@ -105,8 +107,8 @@ form {
 }
 
 /* iOS: date/time入力のスタイル調整 */
-.form-group input[type="date"],
-.form-group input[type="time"] {
+.form-group input[type='date'],
+.form-group input[type='time'] {
   min-height: 44px; /* iOS推奨タッチターゲット */
 }
 
@@ -128,7 +130,9 @@ form {
   border-radius: 50%;
   border: 3px solid transparent;
   cursor: pointer;
-  transition: transform 0.2s, border-color 0.2s;
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
   touch-action: manipulation;
   /* iOS: 最小タッチターゲット */
   min-width: 44px;

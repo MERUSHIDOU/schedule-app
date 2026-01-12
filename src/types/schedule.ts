@@ -1,3 +1,4 @@
+// スケジュールデータ
 export interface Schedule {
   id: string;
   title: string;
@@ -10,6 +11,7 @@ export interface Schedule {
   updatedAt: string;
 }
 
+// スケジュール編集フォームで取り扱う
 export interface ScheduleFormData {
   title: string;
   description: string;
@@ -19,4 +21,5 @@ export interface ScheduleFormData {
   color: string;
 }
 
+// 表示モード(月/週/日)
 export type ViewMode = 'month' | 'week' | 'day';

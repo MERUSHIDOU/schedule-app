@@ -1,0 +1,16 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+dist-ssr
+
+# Cache
+.cache
+
+# Logs
+*.log
+
+# IDE
+.vscode
+.idea
