@@ -12,7 +12,8 @@
     "format:check": "biome format .",
     "preview": "vite preview",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "prepare": "husky"
   },
   "dependencies": {
     "react": "^19.2.0",
@@ -26,11 +27,18 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "husky": "^9.1.7",
     "jsdom": "^27.4.0",
+    "lint-staged": "^16.2.7",
     "sharp": "^0.34.5",
     "typescript": "~5.9.3",
     "vite": "^7.2.4",
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^4.0.16"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,md}": [
+      "biome check --write"
+    ]
   }
 }
