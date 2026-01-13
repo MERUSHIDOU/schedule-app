@@ -6,7 +6,7 @@ import {
   isSameDay,
   isToday,
   getMonthName,
-} from './date';
+} from '../../src/utils/date';
 
 describe('formatDate', () => {
   it('日付をYYYY-MM-DD形式でフォーマットする', () => {
