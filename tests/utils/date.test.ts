@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   formatDate,
   formatDisplayDate,
   getMonthDays,
+  getMonthName,
   isSameDay,
   isToday,
-  getMonthName,
 } from '../../src/utils/date';
 
 describe('formatDate', () => {

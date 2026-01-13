@@ -107,8 +107,8 @@ form {
 }
 
 /* iOS: date/time入力のスタイル調整 */
-.form-group input[type='date'],
-.form-group input[type='time'] {
+.form-group input[type="date"],
+.form-group input[type="time"] {
   min-height: 44px; /* iOS推奨タッチターゲット */
 }
 
@@ -132,7 +132,7 @@ form {
 }
 
 .error-message::before {
-  content: '⚠';
+  content: "⚠";
   font-size: 1rem;
 }
 

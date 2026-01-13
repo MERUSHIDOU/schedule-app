@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Schedule } from '../types/schedule';
-import { getMonthDays, getMonthName, isToday, formatDate } from '../utils/date';
+import { formatDate, getMonthDays, getMonthName, isToday } from '../utils/date';
 import './Calendar.css';
 
 interface CalendarProps {

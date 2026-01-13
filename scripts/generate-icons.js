@@ -1,7 +1,7 @@
+import { writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { writeFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(__dirname, '..', 'public');
@@ -48,24 +48,15 @@ async function generateIcons() {
   const svgBuffer = Buffer.from(calendarSvg);
 
   // 512x512 PWAアイコン
-  await sharp(svgBuffer)
-    .resize(512, 512)
-    .png()
-    .toFile(join(publicDir, 'pwa-512x512.png'));
+  await sharp(svgBuffer).resize(512, 512).png().toFile(join(publicDir, 'pwa-512x512.png'));
   console.log('Generated: pwa-512x512.png');
 
   // 192x192 PWAアイコン
-  await sharp(svgBuffer)
-    .resize(192, 192)
-    .png()
-    .toFile(join(publicDir, 'pwa-192x192.png'));
+  await sharp(svgBuffer).resize(192, 192).png().toFile(join(publicDir, 'pwa-192x192.png'));
   console.log('Generated: pwa-192x192.png');
 
   // 180x180 Apple Touch Icon
-  await sharp(svgBuffer)
-    .resize(180, 180)
-    .png()
-    .toFile(join(publicDir, 'apple-touch-icon.png'));
+  await sharp(svgBuffer).resize(180, 180).png().toFile(join(publicDir, 'apple-touch-icon.png'));
   console.log('Generated: apple-touch-icon.png');
 
   // favicon.svg も更新
