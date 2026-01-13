@@ -8,8 +8,8 @@
 .app-header {
   background: #3b82f6;
   color: white;
-  padding: 8px 20px;
-  padding-top: calc(8px + var(--safe-area-top, 0px));
+  padding: 16px 20px;
+  padding-top: calc(16px + var(--safe-area-top, 0px));
   padding-left: calc(20px + var(--safe-area-left, 0px));
   padding-right: calc(20px + var(--safe-area-right, 0px));
   flex-shrink: 0;
@@ -25,9 +25,9 @@
 
 .app-main {
   flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 16px;
   padding-left: calc(16px + var(--safe-area-left, 0px));
   padding-right: calc(16px + var(--safe-area-right, 0px));
@@ -36,6 +36,8 @@
 
 .app-main > * {
   max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .fab {
@@ -78,8 +80,8 @@
 
 @media (max-width: 480px) {
   .app-header {
-    padding: 7px 16px;
-    padding-top: calc(7px + var(--safe-area-top, 0px));
+    padding: 14px 16px;
+    padding-top: calc(14px + var(--safe-area-top, 0px));
     padding-left: calc(16px + var(--safe-area-left, 0px));
     padding-right: calc(16px + var(--safe-area-right, 0px));
   }
@@ -113,6 +115,6 @@
 /* iOS スタンドアロンモード */
 @media (display-mode: standalone) {
   .app-header {
-    padding-top: calc(8px + var(--safe-area-top, 0px));
+    padding-top: calc(16px + var(--safe-area-top, 0px));
   }
 }
