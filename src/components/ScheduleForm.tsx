@@ -39,6 +39,7 @@ export function ScheduleForm({
   onSubmit,
 }: ScheduleFormProps) {
   const [formData, setFormData] = useState<ScheduleFormData>(initialFormData);
+  const [timeError, setTimeError] = useState<string>('');
 
   useEffect(() => {
     if (schedule) {
@@ -58,18 +59,53 @@ export function ScheduleForm({
         date: selectedDate,
       });
     }
+    // フォームが開かれたときにエラーをクリア
+    setTimeError('');
   }, [schedule, selectedDate, isOpen]);
+
+  // 時刻のバリデーション関数
+  const validateTime = (startTime: string, endTime: string): string => {
+    if (!startTime || !endTime) return '';
+
+    // 時刻を分単位に変換して比較
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+
+    const startMinutes = startHour * 60 + startMinute;
+    const endMinutes = endHour * 60 + endMinute;
+
+    if (startMinutes >= endMinutes) {
+      return '開始時刻は終了時刻よりも前に設定してください';
+    }
+
+    return '';
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title.trim()) return;
+
+    // 送信前に時刻のバリデーションを実行
+    const error = validateTime(formData.startTime, formData.endTime);
+    if (error) {
+      setTimeError(error);
+      return;
+    }
+
     onSubmit(formData);
     onClose();
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const updatedFormData = { ...formData, [name]: value };
+    setFormData(updatedFormData);
+
+    // 時刻フィールドの変更時にバリデーション
+    if (name === 'startTime' || name === 'endTime') {
+      const error = validateTime(updatedFormData.startTime, updatedFormData.endTime);
+      setTimeError(error);
+    }
   };
 
   if (!isOpen) return null;
@@ -136,6 +172,12 @@ export function ScheduleForm({
             </div>
           </div>
 
+          {timeError && (
+            <div className="error-message" role="alert">
+              {timeError}
+            </div>
+          )}
+
           <div className="form-group">
             <label htmlFor="description">説明</label>
             <textarea
@@ -168,7 +210,7 @@ export function ScheduleForm({
             <button type="button" className="btn-cancel" onClick={onClose}>
               キャンセル
             </button>
-            <button type="submit" className="btn-submit">
+            <button type="submit" className="btn-submit" disabled={!!timeError}>
               {schedule ? '更新' : '追加'}
             </button>
           </div>

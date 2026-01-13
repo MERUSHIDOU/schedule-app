@@ -118,6 +118,24 @@ form {
   gap: 12px;
 }
 
+.error-message {
+  color: #dc2626;
+  font-size: 0.875rem;
+  padding: 8px 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-message::before {
+  content: '⚠';
+  font-size: 1rem;
+}
+
 .color-picker {
   display: flex;
   gap: 8px;
@@ -185,6 +203,17 @@ form {
 
 .btn-submit:active {
   background: #1d4ed8;
+}
+
+.btn-submit:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-submit:disabled:active {
+  background: #9ca3af;
+  transform: none;
 }
 
 /* デスクトップ向け: 中央モーダル表示 */
