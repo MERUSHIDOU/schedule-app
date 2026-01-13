@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { Schedule, ScheduleFormData } from '../types/schedule';
 import './ScheduleForm.css';
 
@@ -61,7 +61,7 @@ export function ScheduleForm({
     }
     // フォームが開かれたときにエラーをクリア
     setTimeError('');
-  }, [schedule, selectedDate, isOpen]);
+  }, [schedule, selectedDate]);
 
   // 時刻のバリデーション関数
   const validateTime = (startTime: string, endTime: string): string => {
@@ -131,7 +131,6 @@ export function ScheduleForm({
               onChange={handleChange}
               placeholder="予定のタイトル"
               required
-              autoFocus
             />
           </div>
 

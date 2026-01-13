@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { loadSchedules, saveSchedules, generateId } from '../../src/utils/storage';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Schedule } from '../../src/types/schedule';
+import { generateId, loadSchedules, saveSchedules } from '../../src/utils/storage';
 
 const mockSchedule: Schedule = {
   id: '1',

@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSchedules } from '../../src/hooks/useSchedules';
 import type { ScheduleFormData } from '../../src/types/schedule';
 import * as storage from '../../src/utils/storage';
