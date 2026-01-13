@@ -8,6 +8,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
+    include: ['tests/**/*.{test,spec}.{js,ts,jsx,tsx}'],
   },
   base: '/schedule-app/',
   plugins: [
