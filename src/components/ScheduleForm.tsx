@@ -30,6 +30,21 @@ const initialFormData: ScheduleFormData = {
   color: COLORS[0],
 };
 
+// 10分刻みの時刻オプションを生成
+const generateTimeOptions = (): string[] => {
+  const options: string[] = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute = 0; minute < 60; minute += 10) {
+      const h = hour.toString().padStart(2, '0');
+      const m = minute.toString().padStart(2, '0');
+      options.push(`${h}:${m}`);
+    }
+  }
+  return options;
+};
+
+const TIME_OPTIONS = generateTimeOptions();
+
 // スケジュール編集フォーム
 export function ScheduleForm({
   isOpen,
@@ -96,7 +111,9 @@ export function ScheduleForm({
     onClose();
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     const updatedFormData = { ...formData, [name]: value };
     setFormData(updatedFormData);
@@ -149,27 +166,35 @@ export function ScheduleForm({
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="startTime">開始時刻</label>
-              <input
-                type="time"
+              <select
                 id="startTime"
                 name="startTime"
                 value={formData.startTime}
                 onChange={handleChange}
-                step="600"
                 required
-              />
+              >
+                {TIME_OPTIONS.map(time => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
               <label htmlFor="endTime">終了時刻</label>
-              <input
-                type="time"
+              <select
                 id="endTime"
                 name="endTime"
                 value={formData.endTime}
                 onChange={handleChange}
-                step="600"
                 required
-              />
+              >
+                {TIME_OPTIONS.map(time => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
