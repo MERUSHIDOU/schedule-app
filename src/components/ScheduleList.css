@@ -4,6 +4,10 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 16px;
   margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .list-title {
@@ -13,6 +17,7 @@
   margin-bottom: 16px;
   padding-bottom: 8px;
   border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
 }
 
 .no-schedules {
@@ -22,9 +27,13 @@
 }
 
 .schedules {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   list-style: none;
   padding: 0;
   margin: 0;
+  min-height: 0;
 }
 
 .schedule-item {

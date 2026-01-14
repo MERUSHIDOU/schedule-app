@@ -5,6 +5,13 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  server: {
+    host: true,
+    port: 5173,
+    allowedHosts: ['.ngrok-free.dev', 'localhost'], // すべてのホストを許可
+    // または特定のホストのみ許可する場合
+    // allowedHosts: ['.ngrok-free.app', 'localhost']
+  },
   test: {
     globals: true,
     environment: 'jsdom',

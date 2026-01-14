@@ -1,5 +1,4 @@
 import type { Schedule } from '../types/schedule';
-import { formatDisplayDate } from '../utils/date';
 import './ScheduleList.css';
 
 interface ScheduleListProps {
@@ -17,8 +16,6 @@ export function ScheduleList({ schedules, selectedDate, onEdit, onDelete }: Sche
 
   return (
     <div className="schedule-list">
-      <h3 className="list-title">{formatDisplayDate(selectedDate)}</h3>
-
       {filteredSchedules.length === 0 ? (
         <p className="no-schedules">予定がありません</p>
       ) : (
