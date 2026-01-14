@@ -155,6 +155,7 @@ export function ScheduleForm({
                 name="startTime"
                 value={formData.startTime}
                 onChange={handleChange}
+                step="600"
                 required
               />
             </div>
@@ -166,6 +167,7 @@ export function ScheduleForm({
                 name="endTime"
                 value={formData.endTime}
                 onChange={handleChange}
+                step="600"
                 required
               />
             </div>
