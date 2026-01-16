@@ -17,6 +17,15 @@
 - React + TypeScript + Vite
 - GitHub Pagesでホスティング
 
+## 対象環境（必須）
+
+**Safari + iPhone環境で動作することを前提に設計すること。**
+
+- Safari非対応のHTML/CSS/JS機能は使用しない
+- 実装前にSafari/iOS Safariの互換性を確認する
+- 例: `<input type="time" step="...">` はSafari非対応のため`<select>`を使用する
+- iOS固有のUI/UX（セーフエリア、タッチ操作等）を考慮する
+
 ## 開発コマンド
 
 ```bash
