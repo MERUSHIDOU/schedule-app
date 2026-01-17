@@ -31,3 +31,7 @@ dist-ssr
 # Environment variables
 .env
 .env.local
+
+# e2e-test-runner
+results*.json
+*.png

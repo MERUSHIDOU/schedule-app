@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E2E Test Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #0f0f1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #2a2a4a;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      background: linear-gradient(90deg, #4facfe, #00f2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    #connection-status {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    #connection-status::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    #connection-status.connected {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+    }
+
+    #connection-status.connected::before {
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    #connection-status.disconnected {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+    }
+
+    #connection-status.disconnected::before {
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+    }
+
+    #connection-status.connecting {
+      background: rgba(251, 191, 36, 0.15);
+      color: #fbbf24;
+    }
+
+    #connection-status.connecting::before {
+      background: #fbbf24;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      padding: 1rem;
+      height: calc(100vh - 70px);
+    }
+
+    @media (max-width: 1200px) {
+      .grid {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+
+    .session-panel {
+      background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #2a2a4a;
+      transition: border-color 0.3s;
+    }
+
+    .session-panel.active {
+      border-color: #4facfe;
+      box-shadow: 0 0 20px rgba(79, 172, 254, 0.2);
+    }
+
+    .session-panel.completed {
+      border-color: #10b981;
+    }
+
+    .session-panel.failed {
+      border-color: #ef4444;
+    }
+
+    .session-header {
+      padding: 1rem 1.25rem;
+      background: rgba(0, 0, 0, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .session-id {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
+    .session-status {
+      font-size: 0.75rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .session-status.pending {
+      background: rgba(107, 114, 128, 0.2);
+      color: #9ca3af;
+    }
+
+    .session-status.running {
+      background: rgba(79, 172, 254, 0.2);
+      color: #4facfe;
+      animation: pulse 2s infinite;
+    }
+
+    .session-status.completed {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+    }
+
+    .session-status.failed {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    .session-info {
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .session-scenario {
+      font-size: 0.875rem;
+      color: #a0aec0;
+      max-width: 60%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .session-progress {
+      font-size: 0.875rem;
+      color: #4facfe;
+      font-weight: 500;
+    }
+
+    .session-frame {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      min-height: 300px;
+      position: relative;
+    }
+
+    .session-frame img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .session-frame .no-frame {
+      color: #4a5568;
+      font-size: 0.875rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .session-frame .no-frame svg {
+      width: 48px;
+      height: 48px;
+      opacity: 0.3;
+    }
+
+    .session-error {
+      padding: 0.75rem 1.25rem;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      font-size: 0.8rem;
+      border-top: 1px solid rgba(239, 68, 68, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>E2E Test Dashboard</h1>
+    <div id="connection-status" class="disconnected">Disconnected</div>
+  </header>
+
+  <div class="grid">
+    <div class="session-panel" id="panel-test1">
+      <div class="session-header">
+        <span class="session-id">Session: test1</span>
+        <span class="session-status pending" id="status-test1">Pending</span>
+      </div>
+      <div class="session-info">
+        <span class="session-scenario" id="scenario-test1">-</span>
+        <span class="session-progress" id="progress-test1">-</span>
+      </div>
+      <div class="session-frame">
+        <img id="frame-test1" style="display:none" alt="Browser frame" />
+        <div class="no-frame" id="noframe-test1">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <span>Waiting for stream...</span>
+        </div>
+      </div>
+      <div class="session-error" id="error-test1" style="display:none"></div>
+    </div>
+
+    <div class="session-panel" id="panel-test2">
+      <div class="session-header">
+        <span class="session-id">Session: test2</span>
+        <span class="session-status pending" id="status-test2">Pending</span>
+      </div>
+      <div class="session-info">
+        <span class="session-scenario" id="scenario-test2">-</span>
+        <span class="session-progress" id="progress-test2">-</span>
+      </div>
+      <div class="session-frame">
+        <img id="frame-test2" style="display:none" alt="Browser frame" />
+        <div class="no-frame" id="noframe-test2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <span>Waiting for stream...</span>
+        </div>
+      </div>
+      <div class="session-error" id="error-test2" style="display:none"></div>
+    </div>
+
+    <div class="session-panel" id="panel-test3">
+      <div class="session-header">
+        <span class="session-id">Session: test3</span>
+        <span class="session-status pending" id="status-test3">Pending</span>
+      </div>
+      <div class="session-info">
+        <span class="session-scenario" id="scenario-test3">-</span>
+        <span class="session-progress" id="progress-test3">-</span>
+      </div>
+      <div class="session-frame">
+        <img id="frame-test3" style="display:none" alt="Browser frame" />
+        <div class="no-frame" id="noframe-test3">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <span>Waiting for stream...</span>
+        </div>
+      </div>
+      <div class="session-error" id="error-test3" style="display:none"></div>
+    </div>
+  </div>
+
+  <script src="viewer.js"></script>
+</body>
+</html>
