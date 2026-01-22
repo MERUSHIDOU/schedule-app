@@ -99,7 +99,12 @@ export function ScheduleForm({
     const [endHour, endMinute] = endTime.split(':').map(Number);
 
     const startMinutes = startHour * 60 + startMinute;
-    const endMinutes = endHour * 60 + endMinute;
+    let endMinutes = endHour * 60 + endMinute;
+
+    // 終了時刻が開始時刻より早い場合は翌日と解釈（24時をまたぐケース）
+    if (endMinutes < startMinutes) {
+      endMinutes += 24 * 60; // 翌日として24時間分を加算
+    }
 
     if (startMinutes >= endMinutes) {
       return '開始時刻は終了時刻よりも前に設定してください';
