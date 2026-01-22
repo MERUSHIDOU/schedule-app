@@ -33,6 +33,46 @@ npm run build
 npm run preview
 ```
 
+## テスト
+
+### ユニットテスト（Vitest）
+
+```bash
+# テストを実行（ウォッチモード）
+npm test
+
+# テストを一度だけ実行
+npm run test:run
+```
+
+### E2Eテスト（Playwright）
+
+初回のみ、Playwrightのブラウザをインストールする必要があります：
+
+```bash
+# Playwrightのブラウザをインストール
+npm run playwright:install
+```
+
+テストの実行：
+
+```bash
+# E2Eテストを実行（ヘッドレスモード）
+npm run test:e2e
+
+# E2Eテストを実行（UIモード - テスト結果を視覚的に確認）
+npm run test:e2e:ui
+
+# E2Eテストを実行（ヘッドモード - ブラウザを表示）
+npm run test:e2e:headed
+
+# E2Eテストをデバッグモードで実行
+npm run test:e2e:debug
+```
+
+E2Eテストは以下のブラウザで実行されます：
+- Mobile Safari（iPhone 14 Pro）のみ
+
 ## プロジェクト構成
 
 ```
