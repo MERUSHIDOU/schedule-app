@@ -45,6 +45,18 @@ const generateTimeOptions = (): string[] => {
 
 const TIME_OPTIONS = generateTimeOptions();
 
+// 開始時刻から1時間後の時刻を計算する（24時をまたぐ場合も対応）
+const calculateEndTime = (startTime: string): string => {
+  const [hour, minute] = startTime.split(':').map(Number);
+  const startDate = new Date(2000, 0, 1, hour, minute);
+  startDate.setHours(startDate.getHours() + 1);
+
+  const endHour = startDate.getHours().toString().padStart(2, '0');
+  const endMinute = startDate.getMinutes().toString().padStart(2, '0');
+
+  return `${endHour}:${endMinute}`;
+};
+
 // スケジュール編集フォーム
 export function ScheduleForm({
   isOpen,
@@ -58,7 +70,7 @@ export function ScheduleForm({
 
   useEffect(() => {
     if (schedule) {
-      // 新規作成
+      // 編集モード
       setFormData({
         title: schedule.title,
         description: schedule.description,
@@ -68,7 +80,7 @@ export function ScheduleForm({
         color: schedule.color,
       });
     } else {
-      // 編集
+      // 新規作成モード
       setFormData({
         ...initialFormData,
         date: selectedDate,
@@ -87,7 +99,12 @@ export function ScheduleForm({
     const [endHour, endMinute] = endTime.split(':').map(Number);
 
     const startMinutes = startHour * 60 + startMinute;
-    const endMinutes = endHour * 60 + endMinute;
+    let endMinutes = endHour * 60 + endMinute;
+
+    // 終了時刻が開始時刻より早い場合は翌日と解釈（24時をまたぐケース）
+    if (endMinutes < startMinutes) {
+      endMinutes += 24 * 60; // 翌日として24時間分を加算
+    }
 
     if (startMinutes >= endMinutes) {
       return '開始時刻は終了時刻よりも前に設定してください';
@@ -115,7 +132,14 @@ export function ScheduleForm({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    const updatedFormData = { ...formData, [name]: value };
+    let updatedFormData = { ...formData, [name]: value };
+
+    // 新規作成モードで開始時刻を変更した場合、終了時刻を自動設定
+    if (!schedule && name === 'startTime') {
+      const autoEndTime = calculateEndTime(value);
+      updatedFormData = { ...updatedFormData, endTime: autoEndTime };
+    }
+
     setFormData(updatedFormData);
 
     // 時刻フィールドの変更時にバリデーション
