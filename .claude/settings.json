@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": ["Bash(npm *)", "Bash(git *)", "Bash(gh *)", "Read", "WebFetch"],
+    "deny": [
+      "Bash(rm *)",
+      "Bash(*rm -*)",
+      "Bash(rmdir *)",
+      "Bash(*rmdir *)",
+      "Bash(* rm *)",
+      "Bash(git rm *)",
+      "Bash(*git rm *)",
+      "Bash(git commit * master *)",
+      "Bash(git push * master *)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["github"]
+}
