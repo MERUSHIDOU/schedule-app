@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import type { NotificationConfig } from '../types/notification';
 import type { Schedule, ScheduleFormData } from '../types/schedule';
+import NotificationSettings from './NotificationSettings';
 import './ScheduleForm.css';
 
 interface ScheduleFormProps {
@@ -28,6 +30,10 @@ const initialFormData: ScheduleFormData = {
   startTime: '09:00',
   endTime: '10:00',
   color: COLORS[0],
+  notification: {
+    enabled: true,
+    timing: '15min',
+  },
 };
 
 // 10分刻みの時刻オプションを生成
@@ -78,6 +84,10 @@ export function ScheduleForm({
         startTime: schedule.startTime,
         endTime: schedule.endTime,
         color: schedule.color,
+        notification: schedule.notification || {
+          enabled: false,
+          timing: 'onTime',
+        },
       });
     } else {
       // 新規作成モード
@@ -237,6 +247,16 @@ export function ScheduleForm({
               onChange={handleChange}
               placeholder="予定の詳細（任意）"
               rows={3}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>通知設定</label>
+            <NotificationSettings
+              value={formData.notification || { enabled: false, timing: 'onTime' }}
+              onChange={(notification: NotificationConfig) =>
+                setFormData(prev => ({ ...prev, notification }))
+              }
             />
           </div>
 
