@@ -71,6 +71,11 @@
   color: #6b7280;
   margin: 0;
   word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-wrap;
 }
 
 .schedule-actions {

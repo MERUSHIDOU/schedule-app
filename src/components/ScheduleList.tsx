@@ -1,4 +1,5 @@
 import type { Schedule } from '../types/schedule';
+import { hasMoreThanLines } from '../utils/textUtils';
 import './ScheduleList.css';
 
 interface ScheduleListProps {
@@ -29,7 +30,11 @@ export function ScheduleList({ schedules, selectedDate, onEdit, onDelete }: Sche
                 </div>
                 <h4 className="schedule-title">{schedule.title}</h4>
                 {schedule.description && (
-                  <p className="schedule-description">{schedule.description}</p>
+                  <p
+                    className={`schedule-description ${hasMoreThanLines(schedule.description, 3) ? 'truncated' : ''}`}
+                  >
+                    {schedule.description}
+                  </p>
                 )}
               </div>
               <div className="schedule-actions">
