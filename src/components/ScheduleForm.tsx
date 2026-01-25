@@ -31,7 +31,6 @@ const initialFormData: ScheduleFormData = {
   endTime: '10:00',
   color: COLORS[0],
   notification: {
-    enabled: true,
     timing: '15min',
   },
 };
@@ -85,7 +84,6 @@ export function ScheduleForm({
         endTime: schedule.endTime,
         color: schedule.color,
         notification: schedule.notification || {
-          enabled: false,
           timing: 'onTime',
         },
       });
@@ -253,7 +251,7 @@ export function ScheduleForm({
           <div className="form-group">
             <label>通知設定</label>
             <NotificationSettings
-              value={formData.notification || { enabled: false, timing: 'onTime' }}
+              value={formData.notification || { timing: 'onTime' }}
               onChange={(notification: NotificationConfig) =>
                 setFormData(prev => ({ ...prev, notification }))
               }

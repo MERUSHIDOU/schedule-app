@@ -14,7 +14,7 @@ const notificationQueue: ScheduledNotification[] = [];
  * 通知時刻を計算
  */
 export function calculateNotificationTime(schedule: Schedule): Date | null {
-  if (!schedule.notification?.enabled) {
+  if (!schedule.notification) {
     return null;
   }
 

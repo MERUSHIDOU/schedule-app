@@ -35,7 +35,7 @@ export function useSchedules() {
     };
     setSchedules(prev => [...prev, newSchedule]);
     // 通知設定があればスケジュール
-    if (newSchedule.notification?.enabled) {
+    if (newSchedule.notification) {
       scheduleNotification(newSchedule);
     }
     return newSchedule;
@@ -55,7 +55,7 @@ export function useSchedules() {
             updatedAt: new Date().toISOString(),
           };
           // 新しい通知設定でスケジュール
-          if (updatedSchedule.notification?.enabled) {
+          if (updatedSchedule.notification) {
             scheduleNotification(updatedSchedule);
           }
           return updatedSchedule;

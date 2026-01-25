@@ -34,17 +34,6 @@ describe('notificationScheduler', () => {
       updatedAt: '2026-01-25T10:00:00Z',
     };
 
-    it('should return null when notification is disabled', () => {
-      const schedule: Schedule = {
-        ...baseSchedule,
-        notification: { enabled: false, timing: 'onTime' },
-      };
-
-      const result = calculateNotificationTime(schedule);
-
-      expect(result).toBeNull();
-    });
-
     it('should return null when notification config is not set', () => {
       const schedule: Schedule = { ...baseSchedule };
 
@@ -56,7 +45,7 @@ describe('notificationScheduler', () => {
     it('should calculate notification time for "onTime"', () => {
       const schedule: Schedule = {
         ...baseSchedule,
-        notification: { enabled: true, timing: 'onTime' },
+        notification: { timing: 'onTime' },
       };
 
       const result = calculateNotificationTime(schedule);
@@ -67,7 +56,7 @@ describe('notificationScheduler', () => {
     it('should calculate notification time for "5min"', () => {
       const schedule: Schedule = {
         ...baseSchedule,
-        notification: { enabled: true, timing: '5min' },
+        notification: { timing: '5min' },
       };
 
       const result = calculateNotificationTime(schedule);
@@ -78,7 +67,7 @@ describe('notificationScheduler', () => {
     it('should calculate notification time for "15min"', () => {
       const schedule: Schedule = {
         ...baseSchedule,
-        notification: { enabled: true, timing: '15min' },
+        notification: { timing: '15min' },
       };
 
       const result = calculateNotificationTime(schedule);
@@ -89,7 +78,7 @@ describe('notificationScheduler', () => {
     it('should calculate notification time for "30min"', () => {
       const schedule: Schedule = {
         ...baseSchedule,
-        notification: { enabled: true, timing: '30min' },
+        notification: { timing: '30min' },
       };
 
       const result = calculateNotificationTime(schedule);
@@ -100,7 +89,7 @@ describe('notificationScheduler', () => {
     it('should calculate notification time for "1hour"', () => {
       const schedule: Schedule = {
         ...baseSchedule,
-        notification: { enabled: true, timing: '1hour' },
+        notification: { timing: '1hour' },
       };
 
       const result = calculateNotificationTime(schedule);
@@ -111,7 +100,7 @@ describe('notificationScheduler', () => {
     it('should calculate notification time for "custom"', () => {
       const schedule: Schedule = {
         ...baseSchedule,
-        notification: { enabled: true, timing: 'custom', customMinutes: 45 },
+        notification: { timing: 'custom', customMinutes: 45 },
       };
 
       const result = calculateNotificationTime(schedule);
@@ -122,7 +111,7 @@ describe('notificationScheduler', () => {
     it('should return null when custom timing has no customMinutes', () => {
       const schedule: Schedule = {
         ...baseSchedule,
-        notification: { enabled: true, timing: 'custom' },
+        notification: { timing: 'custom' },
       };
 
       const result = calculateNotificationTime(schedule);
@@ -152,7 +141,7 @@ describe('notificationScheduler', () => {
     it('should schedule notification for future time', () => {
       const schedule: Schedule = {
         ...baseSchedule,
-        notification: { enabled: true, timing: '15min' }, // 13:45に通知
+        notification: { timing: '15min' }, // 13:45に通知
       };
 
       const timerId = scheduleNotification(schedule);
@@ -171,19 +160,7 @@ describe('notificationScheduler', () => {
         ...baseSchedule,
         date: '2026-01-25',
         startTime: '10:00', // 過去の時刻
-        notification: { enabled: true, timing: 'onTime' },
-      };
-
-      const timerId = scheduleNotification(schedule);
-
-      expect(timerId).toBeNull();
-      expect(getScheduledNotifications()).toHaveLength(0);
-    });
-
-    it('should return null when notification config is invalid', () => {
-      const schedule: Schedule = {
-        ...baseSchedule,
-        notification: { enabled: false, timing: 'onTime' },
+        notification: { timing: 'onTime' },
       };
 
       const timerId = scheduleNotification(schedule);
@@ -204,7 +181,7 @@ describe('notificationScheduler', () => {
       color: '#3b82f6',
       createdAt: '2026-01-25T10:00:00Z',
       updatedAt: '2026-01-25T10:00:00Z',
-      notification: { enabled: true, timing: '15min' },
+      notification: { timing: '15min' },
     };
 
     beforeEach(() => {
@@ -242,7 +219,7 @@ describe('notificationScheduler', () => {
           color: '#3b82f6',
           createdAt: '2026-01-25T10:00:00Z',
           updatedAt: '2026-01-25T10:00:00Z',
-          notification: { enabled: true, timing: '15min' },
+          notification: { timing: '15min' },
         },
         {
           id: '2',
@@ -254,7 +231,7 @@ describe('notificationScheduler', () => {
           color: '#ef4444',
           createdAt: '2026-01-25T10:00:00Z',
           updatedAt: '2026-01-25T10:00:00Z',
-          notification: { enabled: true, timing: '30min' },
+          notification: { timing: '30min' },
         },
       ];
 
@@ -274,7 +251,7 @@ describe('notificationScheduler', () => {
         color: '#3b82f6',
         createdAt: '2026-01-25T10:00:00Z',
         updatedAt: '2026-01-25T10:00:00Z',
-        notification: { enabled: true, timing: '15min' },
+        notification: { timing: '15min' },
       };
 
       scheduleNotification(schedule1);
@@ -290,7 +267,7 @@ describe('notificationScheduler', () => {
         color: '#ef4444',
         createdAt: '2026-01-25T10:00:00Z',
         updatedAt: '2026-01-25T10:00:00Z',
-        notification: { enabled: true, timing: '30min' },
+        notification: { timing: '30min' },
       };
 
       rescheduleAllNotifications([schedule2]);

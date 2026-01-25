@@ -67,7 +67,7 @@ describe('useNotification', () => {
       color: '#3b82f6',
       createdAt: '2026-01-25T10:00:00Z',
       updatedAt: '2026-01-25T10:00:00Z',
-      notification: { enabled: true, timing: '15min' },
+      notification: { timing: '15min' },
     };
 
     act(() => {
@@ -101,7 +101,7 @@ describe('useNotification', () => {
         color: '#3b82f6',
         createdAt: '2026-01-25T10:00:00Z',
         updatedAt: '2026-01-25T10:00:00Z',
-        notification: { enabled: true, timing: '15min' },
+        notification: { timing: '15min' },
       },
     ];
 

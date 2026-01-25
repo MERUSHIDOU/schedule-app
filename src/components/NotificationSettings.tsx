@@ -8,13 +8,6 @@ interface NotificationSettingsProps {
 }
 
 function NotificationSettings({ value, onChange, disabled = false }: NotificationSettingsProps) {
-  const handleEnabledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({
-      ...value,
-      enabled: e.target.checked,
-    });
-  };
-
   const handleTimingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const timing = e.target.value as NotificationTiming;
     onChange({
@@ -34,23 +27,13 @@ function NotificationSettings({ value, onChange, disabled = false }: Notificatio
 
   return (
     <div className="notification-settings">
-      <label className="notification-toggle">
-        <input
-          type="checkbox"
-          checked={value.enabled}
-          onChange={handleEnabledChange}
-          disabled={disabled}
-        />
-        <span>通知を有効にする</span>
-      </label>
-
       <div className="notification-timing">
         <label htmlFor="notification-timing-select">通知タイミング</label>
         <select
           id="notification-timing-select"
           value={value.timing}
           onChange={handleTimingChange}
-          disabled={disabled || !value.enabled}
+          disabled={disabled}
         >
           <option value="onTime">開始時刻ちょうど</option>
           <option value="5min">5分前</option>
@@ -71,7 +54,7 @@ function NotificationSettings({ value, onChange, disabled = false }: Notificatio
             max="1440"
             value={value.customMinutes || 0}
             onChange={handleCustomMinutesChange}
-            disabled={disabled || !value.enabled}
+            disabled={disabled}
           />
         </div>
       )}
