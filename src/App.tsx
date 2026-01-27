@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Calendar } from './components/Calendar';
+import NotificationPermissionBanner from './components/NotificationPermissionBanner';
 import { ScheduleForm } from './components/ScheduleForm';
 import { ScheduleList } from './components/ScheduleList';
+import { useNotification } from './hooks/useNotification';
 import { useSchedules } from './hooks/useSchedules';
 import type { Schedule, ScheduleFormData } from './types/schedule';
 import { formatDate } from './utils/date';
@@ -9,9 +11,43 @@ import './App.css';
 
 function App() {
   const { schedules, addSchedule, updateSchedule, deleteSchedule } = useSchedules();
+  const { permission, isPWAMode, requestPermission, rescheduleAll } = useNotification();
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
+  const [showNotificationBanner, setShowNotificationBanner] = useState(false);
+
+  // 通知バナーの表示判定
+  useEffect(() => {
+    const shouldShow = isPWAMode && permission === 'default';
+    setShowNotificationBanner(shouldShow);
+  }, [isPWAMode, permission]);
+
+  // フォアグラウンド復帰時に通知を再スケジュール
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        rescheduleAll(schedules);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [schedules, rescheduleAll]);
+
+  // 通知許可リクエスト
+  const handlePermissionGranted = async () => {
+    await requestPermission();
+    setShowNotificationBanner(false);
+  };
+
+  // バナーを閉じる
+  const handleDismissBanner = () => {
+    setShowNotificationBanner(false);
+  };
 
   // 予定追加ボタンを押したとき
   const handleAddClick = () => {
@@ -54,6 +90,13 @@ function App() {
       </header>
 
       <main className="app-main">
+        {showNotificationBanner && (
+          <NotificationPermissionBanner
+            onPermissionGranted={handlePermissionGranted}
+            onDismiss={handleDismissBanner}
+          />
+        )}
+
         <Calendar
           schedules={schedules}
           selectedDate={selectedDate}

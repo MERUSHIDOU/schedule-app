@@ -10,16 +10,19 @@ describe('ScheduleList', () => {
   const createSchedule = (overrides?: Partial<Schedule>): Schedule => ({
     id: '1',
     title: 'テストスケジュール',
+    description: '',
     date: '2024-01-01',
     startTime: '09:00',
     endTime: '10:00',
     color: '#3b82f6',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
     ...overrides,
   });
 
   describe('説明テキスト表示', () => {
     it('説明がない場合は表示されない', () => {
-      const schedules = [createSchedule({ description: undefined })];
+      const schedules = [createSchedule({ description: '' })];
       render(
         <ScheduleList
           schedules={schedules}

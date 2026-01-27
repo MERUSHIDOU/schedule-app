@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { Schedule, ScheduleFormData } from '../types/schedule';
+import {
+  cancelNotification,
+  rescheduleAllNotifications,
+  scheduleNotification,
+} from '../utils/notificationScheduler';
 import { generateId, hasStorageData, loadSchedules, saveSchedules } from '../utils/storage';
 
 // スケジュールデータのCRUD
@@ -7,7 +12,10 @@ export function useSchedules() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
 
   useEffect(() => {
-    setSchedules(loadSchedules());
+    const loadedSchedules = loadSchedules();
+    setSchedules(loadedSchedules);
+    // 初回ロード時にすべての通知を再スケジュール
+    rescheduleAllNotifications(loadedSchedules);
   }, []);
 
   useEffect(() => {
@@ -26,22 +34,41 @@ export function useSchedules() {
       updatedAt: now,
     };
     setSchedules(prev => [...prev, newSchedule]);
+    // 通知設定があればスケジュール
+    if (newSchedule.notification) {
+      scheduleNotification(newSchedule);
+    }
     return newSchedule;
   }, []);
 
   // UPDATE
   const updateSchedule = useCallback((id: string, data: ScheduleFormData) => {
+    // 既存通知をキャンセル
+    cancelNotification(id);
+
     setSchedules(prev =>
-      prev.map(schedule =>
-        schedule.id === id
-          ? { ...schedule, ...data, updatedAt: new Date().toISOString() }
-          : schedule
-      )
+      prev.map(schedule => {
+        if (schedule.id === id) {
+          const updatedSchedule = {
+            ...schedule,
+            ...data,
+            updatedAt: new Date().toISOString(),
+          };
+          // 新しい通知設定でスケジュール
+          if (updatedSchedule.notification) {
+            scheduleNotification(updatedSchedule);
+          }
+          return updatedSchedule;
+        }
+        return schedule;
+      })
     );
   }, []);
 
   // DELETE
   const deleteSchedule = useCallback((id: string) => {
+    // 関連通知をキャンセル
+    cancelNotification(id);
     setSchedules(prev => prev.filter(schedule => schedule.id !== id));
   }, []);
 
