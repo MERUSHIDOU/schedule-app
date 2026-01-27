@@ -13,16 +13,18 @@
 
 ベースブランチ: `master`
 
-## Git ワークフロー
+## Git ワークフロー（必須）
 
-すべての変更は新しいブランチで作業し、Pull Requestで提出すること。
+**すべての変更はgit worktreeを使用し、Pull Requestで提出すること。**
 
-### 基本ルール
-- 常に新しいブランチで作業
-- 1ブランチ1修正の原則
-- すべての変更はPR経由
+### 主要コマンド
 
-### 詳細ルール
+```bash
+npm run worktree:new <type> <name>     # 新しいworktreeを作成
+npm run worktree:list                   # worktree一覧を表示
+npm run worktree:remove <type> <name>   # worktreeを削除
+```
+
 詳細なワークフローとベストプラクティスは `.claude/rules/workflow.md` を参照。
 
 ## プロジェクト概要
