@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Calendar } from './components/Calendar';
 import { ScheduleForm } from './components/ScheduleForm';
 import { ScheduleList } from './components/ScheduleList';
+import { VersionInfo } from './components/VersionInfo';
 import { useSchedules } from './hooks/useSchedules';
 import type { Schedule, ScheduleFormData } from './types/schedule';
 import { formatDate } from './utils/date';
@@ -51,6 +52,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1>スケジュール</h1>
+        <VersionInfo />
       </header>
 
       <main className="app-main">

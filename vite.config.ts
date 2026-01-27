@@ -1,10 +1,17 @@
 /// <reference types="vitest" />
 
+import { readFileSync } from 'node:fs';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'));
+
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(packageJson.version),
+    __BUILD_DATE__: JSON.stringify(new Date().toISOString()),
+  },
   server: {
     host: true,
     port: 5173,
