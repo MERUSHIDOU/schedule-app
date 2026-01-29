@@ -21,6 +21,7 @@
     "worktree:new": "bash scripts/new-worktree.sh",
     "worktree:remove": "bash scripts/remove-worktree.sh",
     "worktree:list": "git worktree list",
+    "worktree:cleanup": "bash scripts/cleanup-merged-worktrees.sh",
     "prepare": "husky"
   },
   "dependencies": {
