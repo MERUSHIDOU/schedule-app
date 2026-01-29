@@ -25,7 +25,17 @@ npm run worktree:list                   # worktree一覧を表示
 npm run worktree:remove <type> <name>   # worktreeを削除
 ```
 
-詳細なワークフローとベストプラクティスは `.claude/rules/workflow.md` を参照。
+### 変更の提出
+
+```bash
+/ship  # 変更をコミット、プッシュし、Pull Requestを作成（推奨）
+```
+
+`/ship`スキルは、変更内容の確認、commit message生成、コミット、プッシュ、PR作成を自動化します。
+
+**詳細ドキュメント**:
+- `/ship`スキル: `.claude/skills/ship/SKILL.md`
+- Gitワークフロー: `.claude/rules/workflow.md`
 
 ## プロジェクト概要
 

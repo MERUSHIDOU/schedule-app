@@ -37,18 +37,17 @@ cd ../schedule-app-feat-new-feature
 # 3. 開発サーバーを起動して変更を実装
 npm run dev
 
-# 4. コミット
+# 4. 変更をコミット、プッシュし、PR作成（推奨）
+/ship
+
+# または手動で実行
 git add .
 git commit -m "feat: 新機能の説明"
-
-# 5. プッシュしてPR作成
 git push -u origin feat/new-feature
-# GitHub上でPRを作成
-
-# 6. 作業完了後、メインプロジェクトに戻ってworktreeを削除
-cd ../schedule-app
-npm run worktree:remove feat new-feature
+gh pr create --title "..." --body "..."
 ```
+
+**推奨**: `/ship`スキルを使用すると、コミット、プッシュ、PR作成を自動化できます。詳細は`.claude/skills/ship/SKILL.md`を参照。
 
 ### 別の修正が必要になった場合
 
@@ -88,15 +87,17 @@ cd ../schedule-app-fix-urgent-bug
 npm run worktree:list
 ```
 
-### worktreeの削除
+### worktreeの削除（任意）
 
-作業完了後は必ずworktreeを削除してクリーンアップ：
+worktreeが不要になった場合は削除できます：
 
 ```bash
 # メインプロジェクトから実行
 cd ../schedule-app
 npm run worktree:remove feat new-feature
 ```
+
+**Note**: マージ済みブランチのworktreeは、`npm run worktree:cleanup`で一括削除できます。
 
 ### 環境設定ファイルの自動コピー
 
@@ -120,8 +121,9 @@ npm run worktree:remove feat new-feature
    - 親ディレクトリに作成されます（例: `../schedule-app-feat-new-feature/`）
    - `.gitignore`の影響を受けません
 
-3. **作業完了後のクリーンアップ**
+3. **worktreeとブランチの管理**
    - worktreeを削除してもブランチは残ります
+   - マージ済みブランチのworktreeは`npm run worktree:cleanup`で一括削除できます
    - ブランチも削除する場合は`git branch -D <branch-name>`を実行
 
 ## Best Practices
@@ -130,27 +132,13 @@ npm run worktree:remove feat new-feature
 2. **明確なコミットメッセージ**: 何を変更したか明確に記述
 3. **テスト実行**: PRを作成する前に必ずテストを実行
 4. **競合の解決**: PRマージ前にベースブランチの最新変更を取り込む
-5. **worktreeのクリーンアップ**: 作業完了後は必ず`worktree:remove`を実行
+5. **worktreeの管理**: マージ済みブランチのworktreeは`npm run worktree:cleanup`で定期的に削除
 
 ## Commit Message Format
 
-以下の形式を推奨：
+コミットメッセージの形式については、`.claude/skills/ship/SKILL.md`を参照してください。
 
-```
-<type>: <subject>
-
-<body>
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
-```
-
-**Types**:
-- `feat`: 新機能
-- `fix`: バグ修正
-- `docs`: ドキュメントのみの変更
-- `refactor`: リファクタリング
-- `test`: テストの追加・修正
-- `chore`: ビルド、設定ファイルの変更
+`/ship`スキルを使用すると、変更内容に基づいた適切なcommit messageが自動生成されます。
 
 ---
 
