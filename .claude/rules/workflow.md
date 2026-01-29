@@ -21,7 +21,14 @@
 
 ## Branch Naming Convention
 
-ブランチ名の規則は `CLAUDE.md` を参照。
+- 機能追加: `feat/<機能名>`
+- バグ修正: `fix/<修正内容>`
+- ドキュメント: `docs/<内容>`
+- リファクタリング: `refactor/<内容>`
+- テスト追加: `test/<内容>`
+- ビルド・設定: `chore/<内容>`
+
+ベースブランチ: `master`
 
 ## Workflow Examples
 

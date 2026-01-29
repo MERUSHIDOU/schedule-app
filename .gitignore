@@ -28,6 +28,9 @@ dist-ssr
 .claude/logs/
 .mcp.json
 
+# Implementation plans
+plans/
+
 # Environment variables
 .env
 .env.local
