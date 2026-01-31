@@ -30,19 +30,91 @@
 
 ベースブランチ: `master`
 
-## Workflow Examples
+## tmux統合機能
 
-### 新機能追加の場合
+**tmuxセッション内で実行すると、worktree作成時に自動的に新しいpaneが作成され、新しいClaudeセッションが起動します。**
+
+### タスクコンテキストファイル
+
+worktree作成時に、タスク情報を含む`.claude/worktree-context.md`ファイルが自動生成されます：
+
+```markdown
+# Worktree タスクコンテキスト
+
+作成日時: 2026-01-31 14:30
+ブランチ: feat/new-feature
+Worktreeパス: /path/to/schedule-app-feat-new-feature
+
+## ユーザーからの指示
+
+タスク説明がここに表示されます
+
+## 関連ドキュメント
+
+実装計画や設計ドキュメントが自動検出されます
+
+## 推奨ワークフロー
+
+1. このコンテキストを確認
+2. 実装計画を読む（`plans/`ディレクトリ内）
+3. `/tdd`でテスト駆動開発を開始
+4. `/code-review`でセキュリティと品質をレビュー
+5. `/ship`でコミット、プッシュ、PR作成
+```
+
+### 使い方
+
+#### tmux内での実行（推奨）
 
 ```bash
-# 1. 新しいworktreeを作成（依存関係も自動インストール）
+# tmuxセッションを開く
+tmux
+
+# worktreeを作成（タスク説明を指定）
+npm run worktree:new feat new-feature --task "新機能の説明"
+
+# 自動で以下が実行されます：
+# 1. 新しいworktreeを作成
+# 2. 依存関係をインストール
+# 3. タスクコンテキストファイルを生成
+# 4. tmux paneを水平分割（左右）で作成
+# 5. 新しいpaneでClaudeを起動し、コンテキストを表示
+```
+
+結果：
+- 左pane：メインプロジェクト（開発サーバーやgit操作用）
+- 右pane：新しいworktreeでClaude起動（コンテキスト付き）
+
+#### tmux外での実行
+
+```bash
+# tmux外で実行
 npm run worktree:new feat new-feature
 
-# 2. worktreeディレクトリに移動
+# worktreeのみ作成される（警告メッセージを表示）
+# 手動でworktreeディレクトリに移動してClaudeを起動
 cd ../schedule-app-feat-new-feature
+claude
+```
 
-# 3. 開発サーバーを起動して変更を実装
-npm run dev
+## Workflow Examples
+
+### 新機能追加の場合（推奨: tmux統合）
+
+```bash
+# tmuxセッション内で実行
+tmux
+
+# 1. worktreeを作成（タスク説明付き）
+npm run worktree:new feat new-feature --task "新しいUI要素を追加"
+
+# 2. 自動で以下が実行されます：
+#    - worktree作成、依存関係インストール
+#    - 新しいpaneが作成される
+#    - 新しいpaneでClaudeが起動し、コンテキストを表示
+
+# 3. 左paneでは、元のプロジェクトで開発サーバーなど実行可能
+#    右paneでは、Claudeが新しいworktreeのコンテキストで動作
 
 # 4. 変更をコミット、プッシュし、PR作成（推奨）
 /ship
@@ -56,16 +128,31 @@ gh pr create --title "..." --body "..."
 
 **推奨**: `/ship`スキルを使用すると、コミット、プッシュ、PR作成を自動化できます。詳細は`.claude/skills/ship/SKILL.md`を参照。
 
-### 別の修正が必要になった場合
+### シンプルな使い方（タスク説明なし）
 
 ```bash
-# ❌ 間違った方法: 既存のworktreeで別の作業
-cd ../schedule-app-feat-new-feature  # これはダメ！
+# タスク説明を指定しない場合
+npm run worktree:new fix bug-fix
 
-# ✅ 正しい方法: メインプロジェクトから新しいworktreeを作成
+# コンテキストファイルに「タスク説明はありません」と表示されます
+```
+
+### 別の修正が必要になった場合（tmux利用）
+
+```bash
+# tmuxセッション内で複数のworktreeを並行作業
+
+# 1つ目のworktreeが既に開いている状態で、
+# 緊急のバグ修正が必要な場合：
+
+# 元のpaneに戻る（またはメインプロジェクトディレクトリで実行）
 cd ../schedule-app
-npm run worktree:new fix another-issue  # 依存関係も自動インストール
-cd ../schedule-app-fix-another-issue
+
+# 2つ目のworktreeを作成（別のpaneが自動作成される）
+npm run worktree:new fix urgent-bug --task "緊急バグ修正"
+
+# 左右のpaneを切り替えて、複数タスクを並行作業可能
+# tmux pane切り替え: Ctrl-b + 方向キー（または Ctrl-b + o）
 ```
 
 ### 複数ブランチの並行作業
