@@ -17,8 +17,14 @@ if [ -f "$CONTEXT_FILE" ]; then
     echo ""
 fi
 
+# メインプロジェクトディレクトリを取得
+GIT_COMMON_DIR=$(git rev-parse --git-common-dir)
+MAIN_PROJECT_DIR=$(cd "$GIT_COMMON_DIR" && cd .. && pwd)
+
 # Claudeを起動（バックグラウンド）
-claude --dangerously-skip-permissions &
+# - 現在のディレクトリ（ワークツリー）を追加
+# - 元のプロジェクトディレクトリも追加（計画書や設計ドキュメント参照用）
+claude --add-dir "$PWD" --add-dir "$MAIN_PROJECT_DIR" &
 CLAUDE_PID=$!
 
 # Claudeの起動と初期化を待つ
@@ -39,6 +45,7 @@ $CONTEXT_CONTENT"
         # tmuxに送信（改行を含むテキストを送信）
         sleep 1  # Claudeの完全な初期化を待つ
         tmux send-keys -t "$CURRENT_PANE" "$PROMPT" C-m
+        tmux send-keys -t "$CURRENT_PANE" C-m
     fi
 fi
 
