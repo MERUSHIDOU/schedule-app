@@ -18,7 +18,7 @@ if [ -f "$CONTEXT_FILE" ]; then
 fi
 
 # Claudeを起動（バックグラウンド）
-claude &
+claude --dangerously-skip-permissions &
 CLAUDE_PID=$!
 
 # Claudeの起動と初期化を待つ
