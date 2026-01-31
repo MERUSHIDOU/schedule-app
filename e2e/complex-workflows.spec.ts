@@ -347,7 +347,7 @@ test.describe('複雑なワークフローテスト', () => {
 
   test('編集中に別の日付を選択しても編集フォームは維持される', async ({ page }) => {
     const calendar = page.locator('.calendar');
-    const days = calendar.locator('button.calendar-day:not(.other-month)');
+    const _days = calendar.locator('button.calendar-day:not(.other-month)');
 
     // スケジュールを追加
     await page.getByRole('button', { name: '予定を追加' }).click();

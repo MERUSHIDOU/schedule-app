@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSwipe } from '../hooks/useSwipe';
 import type { Schedule } from '../types/schedule';
 import { formatDate, getMonthDays, getMonthName, isToday } from '../utils/date';
 import './Calendar.css';
@@ -34,6 +35,13 @@ export function Calendar({ schedules, selectedDate, onSelectDate }: CalendarProp
     onSelectDate(formatDate(new Date()));
   };
 
+  // スワイプハンドラの設定
+  const swipeHandlers = useSwipe(
+    goToNextMonth, // 左スワイプで次月
+    goToPrevMonth, // 右スワイプで前月
+    { threshold: 50, velocityThreshold: 0.3 }
+  );
+
   /**
    * 指定された日付のスケジュールを取得
    * @param date
@@ -46,14 +54,14 @@ export function Calendar({ schedules, selectedDate, onSelectDate }: CalendarProp
   return (
     <div className="calendar">
       <div className="calendar-header">
-        <button className="nav-btn" onClick={goToPrevMonth} aria-label="前月">
+        <button type="button" className="nav-btn" onClick={goToPrevMonth} aria-label="前月">
           &#8249;
         </button>
         <h2 className="month-title">{getMonthName(year, month)}</h2>
-        <button className="nav-btn" onClick={goToNextMonth} aria-label="次月">
+        <button type="button" className="nav-btn" onClick={goToNextMonth} aria-label="次月">
           &#8250;
         </button>
-        <button className="today-btn" onClick={goToToday}>
+        <button type="button" className="today-btn" onClick={goToToday}>
           今日
         </button>
       </div>
@@ -69,7 +77,15 @@ export function Calendar({ schedules, selectedDate, onSelectDate }: CalendarProp
         ))}
       </div>
 
-      <div className="calendar-grid">
+      {/* biome-ignore lint/a11y/useSemanticElements: CSS Gridレイアウトが必要なため、tableは使用できません */}
+      <div
+        className="calendar-grid"
+        role="grid"
+        aria-label="カレンダー。左右にスワイプで月を移動できます"
+        onTouchStart={e => swipeHandlers.onTouchStart(e.nativeEvent)}
+        onTouchMove={e => swipeHandlers.onTouchMove(e.nativeEvent)}
+        onTouchEnd={e => swipeHandlers.onTouchEnd(e.nativeEvent)}
+      >
         {days.map((date, index) => {
           const dateStr = formatDate(date);
           const daySchedules = getSchedulesForDay(date);
@@ -79,6 +95,7 @@ export function Calendar({ schedules, selectedDate, onSelectDate }: CalendarProp
 
           return (
             <button
+              type="button"
               key={index}
               className={`calendar-day ${!isCurrentMonth ? 'other-month' : ''} ${
                 isToday(date) ? 'today' : ''
