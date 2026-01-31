@@ -32,7 +32,7 @@
 
 ## tmux統合機能
 
-**tmuxセッション内で実行すると、worktree作成時に自動的に新しいpaneが作成され、新しいClaudeセッションが起動します。**
+**tmuxセッション内で実行すると、worktree作成時に自動的に新しいpaneが作成され、新しいClaudeセッションが起動します。タスクコンテキストが自然文で自動送信され、Claudeが適切なワークフロー（planner, tdd-guide等）を自動選択します。**
 
 ### タスクコンテキストファイル
 
@@ -55,9 +55,9 @@ Worktreeパス: /path/to/schedule-app-feat-new-feature
 
 ## 推奨ワークフロー
 
-1. このコンテキストを確認
+1. タスクコンテキストを確認
 2. 実装計画を読む（`plans/`ディレクトリ内）
-3. `/tdd`でテスト駆動開発を開始
+3. Claudeが自動的に適切なワークフローを選択（planner, tdd-guide等）
 4. `/code-review`でセキュリティと品質をレビュー
 5. `/ship`でコミット、プッシュ、PR作成
 ```
@@ -78,7 +78,7 @@ npm run worktree:new -- feat new-feature --task "新機能の説明"
 # 2. 依存関係をインストール
 # 3. タスクコンテキストファイルを生成
 # 4. tmux paneを水平分割（左右）で作成
-# 5. 新しいpaneでClaudeを起動し、コンテキストを表示
+# 5. 新しいpaneでClaudeを起動し、タスクコンテキストを自然文で送信
 ```
 
 結果：
@@ -111,7 +111,8 @@ npm run worktree:new -- feat new-feature --task "新しいUI要素を追加"
 # 2. 自動で以下が実行されます：
 #    - worktree作成、依存関係インストール
 #    - 新しいpaneが作成される
-#    - 新しいpaneでClaudeが起動し、コンテキストを表示
+#    - 新しいpaneでClaudeが起動し、タスクコンテキストを自然文で送信
+#    - Claudeが自動的に適切なワークフロー（planner, tdd-guide等）を選択
 
 # 3. 左paneでは、元のプロジェクトで開発サーバーなど実行可能
 #    右paneでは、Claudeが新しいworktreeのコンテキストで動作

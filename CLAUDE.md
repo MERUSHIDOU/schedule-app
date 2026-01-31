@@ -28,10 +28,10 @@ npm run worktree:remove -- <type> <name>   # worktreeを削除
 2. 依存関係をインストール
 3. タスクコンテキストファイル（`.claude/worktree-context.md`）を自動生成
 4. tmux paneを水平分割（左右）で作成
-5. 新しいpaneでClaudeを起動し、コンテキストを表示
+5. 新しいpaneでClaudeを起動し、タスクコンテキストを自然文で送信
 
 **利点:**
-- タスク情報がClaudeセッション間で引き継がれる
+- タスク情報がClaudeに自動送信され、適切なワークフローを自動選択
 - 複数のworktreeを並行して作業可能（各paneで独立）
 - 元のプロジェクトと新しいworktreeを左右のpaneで同時表示
 - 効率的な開発環境構築
