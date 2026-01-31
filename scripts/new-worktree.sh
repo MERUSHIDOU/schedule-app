@@ -102,6 +102,18 @@ for FILE in "${FILES_TO_COPY[@]}"; do
     fi
 done
 
+# ディレクトリをコピー
+DIRS_TO_COPY=("plans")
+
+for DIR in "${DIRS_TO_COPY[@]}"; do
+    if [ -d "${DIR}" ]; then
+        cp -r "${DIR}" "${WORKTREE_DIR}/${DIR}"
+        echo "  ✓ ${DIR}/ ディレクトリをコピーしました"
+    else
+        echo "  - ${DIR}/ は存在しません（スキップ）"
+    fi
+done
+
 # 依存関係をインストール
 echo ""
 echo "4. 依存関係をインストール..."

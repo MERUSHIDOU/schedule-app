@@ -48,8 +48,12 @@
     "vitest": "^4.0.16"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,css}": [
+    "*.{js,jsx,ts,tsx,css}": [
       "biome check --write"
-    ]
+    ],
+    "*.json": [
+      "biome check --write"
+    ],
+    "package-lock.json": []
   }
 }
