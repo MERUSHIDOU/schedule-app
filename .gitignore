@@ -6,6 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+tmux-*.log
 
 node_modules
 dist
@@ -26,6 +27,7 @@ dist-ssr
 # Claude Code local settings
 .claude/settings.local.json
 .claude/logs/
+.claude/worktree-context.md
 .mcp.json
 
 # Implementation plans

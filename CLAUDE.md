@@ -11,10 +11,39 @@
 ### 主要コマンド
 
 ```bash
-npm run worktree:new <type> <name>     # 新しいworktreeを作成
+# tmux統合機能付き（推奨）
+npm run worktree:new <type> <name> --task "タスク説明"  # worktree作成、pane分割、Claude起動
+
+# シンプル版
+npm run worktree:new <type> <name>     # worktree作成のみ
 npm run worktree:list                   # worktree一覧を表示
 npm run worktree:remove <type> <name>   # worktreeを削除
 ```
+
+#### tmux統合機能について
+
+**tmuxセッション内で実行すると、自動的に以下が実行されます：**
+
+1. 新しいworktreeを作成
+2. 依存関係をインストール
+3. タスクコンテキストファイル（`.claude/worktree-context.md`）を自動生成
+4. tmux paneを水平分割（左右）で作成
+5. 新しいpaneでClaudeを起動し、コンテキストを表示
+
+**利点:**
+- タスク情報がClaudeセッション間で引き継がれる
+- 複数のworktreeを並行して作業可能（各paneで独立）
+- 元のプロジェクトと新しいworktreeを左右のpaneで同時表示
+- 効率的な開発環境構築
+
+**使用方法:**
+```bash
+# tmuxセッション内で実行
+tmux
+npm run worktree:new feat my-feature --task "新しいUI要素を追加"
+```
+
+詳細は `.claude/rules/workflow.md` の「tmux統合機能」セクションを参照。
 
 ### 変更の提出
 

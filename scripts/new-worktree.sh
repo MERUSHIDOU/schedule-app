@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Git Worktree作成スクリプト
-# 使い方: ./scripts/new-worktree.sh <type> <name>
-# 例: ./scripts/new-worktree.sh feat new-feature
+# 使い方: ./scripts/new-worktree.sh <type> <name> [--task "description"]
+# 例: ./scripts/new-worktree.sh feat new-feature --task "新機能の説明"
 
 set -e
 
 # 引数チェック
-if [ $# -ne 2 ]; then
+if [ $# -lt 2 ]; then
     echo "エラー: 引数が不足しています"
-    echo "使い方: npm run worktree:new <type> <name>"
+    echo "使い方: npm run worktree:new <type> <name> [--task \"description\"]"
     echo ""
     echo "利用可能なtype:"
     echo "  feat      - 新機能"
@@ -19,12 +19,28 @@ if [ $# -ne 2 ]; then
     echo "  test      - テスト追加"
     echo "  chore     - ビルド・設定"
     echo ""
-    echo "例: npm run worktree:new feat new-feature"
+    echo "例: npm run worktree:new feat new-feature --task \"新機能の説明\""
     exit 1
 fi
 
 TYPE=$1
 NAME=$2
+TASK_DESCRIPTION=""
+
+# オプション引数の解析
+shift 2
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --task)
+            TASK_DESCRIPTION="$2"
+            shift 2
+            ;;
+        *)
+            echo "エラー: 不明なオプション '${1}'"
+            exit 1
+            ;;
+    esac
+done
 BRANCH_NAME="${TYPE}/${NAME}"
 BASE_BRANCH="master"
 
@@ -119,6 +135,48 @@ echo ""
 echo "4. 依存関係をインストール..."
 cd "${WORKTREE_DIR}"
 npm install
+
+# タスクコンテキストファイルを生成
+echo ""
+echo "5. タスクコンテキストファイルを生成..."
+cd - > /dev/null  # 元のディレクトリに戻る
+bash scripts/create-worktree-context.sh \
+    "${WORKTREE_DIR}" \
+    "${BRANCH_NAME}" \
+    "${TASK_DESCRIPTION}"
+
+# tmux統合処理
+if [ -n "$TMUX" ]; then
+    echo ""
+    echo "6. tmux paneを作成してClaudeを起動..."
+    echo ""
+
+    # 新しいpaneを作成（水平分割、worktreeディレクトリで開始）
+    PANE_ID=$(tmux split-window -h -c "${WORKTREE_DIR}" -P -F "#{pane_id}")
+
+    if [ -z "$PANE_ID" ]; then
+        echo "警告: tmux paneの作成に失敗しました"
+        echo "手動でWorktreeディレクトリに移動してClaudeを起動してください:"
+        echo "  cd ${WORKTREE_DIR}"
+        echo "  claude"
+    else
+        # 新しいpaneでClaude起動スクリプトを実行
+        tmux send-keys -t "$PANE_ID" "bash scripts/launch-claude-with-context.sh" C-m
+        echo "✓ 新しいpaneでClaudeが起動しました"
+        echo ""
+        echo "Pane情報: ${PANE_ID}"
+    fi
+else
+    echo ""
+    echo "========================================="
+    echo "注意: tmuxセッション外で実行されました"
+    echo "========================================="
+    echo ""
+    echo "tmux統合機能を使用する場合は、tmuxセッション内で実行してください:"
+    echo "  tmux"
+    echo "  npm run worktree:new ${TYPE} ${NAME} --task \"タスク説明\""
+    echo ""
+fi
 
 echo ""
 echo "========================================="
