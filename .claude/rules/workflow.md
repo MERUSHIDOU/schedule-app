@@ -71,7 +71,7 @@ Worktreeパス: /path/to/schedule-app-feat-new-feature
 tmux
 
 # worktreeを作成（タスク説明を指定）
-npm run worktree:new feat new-feature --task "新機能の説明"
+npm run worktree:new -- feat new-feature --task "新機能の説明"
 
 # 自動で以下が実行されます：
 # 1. 新しいworktreeを作成
@@ -89,7 +89,7 @@ npm run worktree:new feat new-feature --task "新機能の説明"
 
 ```bash
 # tmux外で実行
-npm run worktree:new feat new-feature
+npm run worktree:new -- feat new-feature
 
 # worktreeのみ作成される（警告メッセージを表示）
 # 手動でworktreeディレクトリに移動してClaudeを起動
@@ -106,7 +106,7 @@ claude
 tmux
 
 # 1. worktreeを作成（タスク説明付き）
-npm run worktree:new feat new-feature --task "新しいUI要素を追加"
+npm run worktree:new -- feat new-feature --task "新しいUI要素を追加"
 
 # 2. 自動で以下が実行されます：
 #    - worktree作成、依存関係インストール
@@ -132,7 +132,7 @@ gh pr create --title "..." --body "..."
 
 ```bash
 # タスク説明を指定しない場合
-npm run worktree:new fix bug-fix
+npm run worktree:new -- fix bug-fix
 
 # コンテキストファイルに「タスク説明はありません」と表示されます
 ```
@@ -149,7 +149,7 @@ npm run worktree:new fix bug-fix
 cd ../schedule-app
 
 # 2つ目のworktreeを作成（別のpaneが自動作成される）
-npm run worktree:new fix urgent-bug --task "緊急バグ修正"
+npm run worktree:new -- fix urgent-bug --task "緊急バグ修正"
 
 # 左右のpaneを切り替えて、複数タスクを並行作業可能
 # tmux pane切り替え: Ctrl-b + 方向キー（または Ctrl-b + o）
@@ -166,7 +166,7 @@ npm run dev  # ポート5173で起動
 
 # 別ターミナルで緊急バグ修正（依存関係も自動インストール）
 cd ../schedule-app
-npm run worktree:new fix urgent-bug
+npm run worktree:new -- fix urgent-bug
 cd ../schedule-app-fix-urgent-bug
 # 修正してコミット
 
@@ -188,7 +188,7 @@ worktreeが不要になった場合は削除できます：
 ```bash
 # メインプロジェクトから実行
 cd ../schedule-app
-npm run worktree:remove feat new-feature
+npm run worktree:remove -- feat new-feature
 ```
 
 **Note**: マージ済みブランチのworktreeは、`npm run worktree:cleanup`で一括削除できます。

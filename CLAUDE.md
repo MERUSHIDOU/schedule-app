@@ -12,12 +12,12 @@
 
 ```bash
 # tmux統合機能付き（推奨）
-npm run worktree:new <type> <name> --task "タスク説明"  # worktree作成、pane分割、Claude起動
+npm run worktree:new -- <type> <name> --task "タスク説明"  # worktree作成、pane分割、Claude起動
 
 # シンプル版
-npm run worktree:new <type> <name>     # worktree作成のみ
-npm run worktree:list                   # worktree一覧を表示
-npm run worktree:remove <type> <name>   # worktreeを削除
+npm run worktree:new -- <type> <name>     # worktree作成のみ
+npm run worktree:list                      # worktree一覧を表示
+npm run worktree:remove -- <type> <name>   # worktreeを削除
 ```
 
 #### tmux統合機能について
@@ -40,7 +40,7 @@ npm run worktree:remove <type> <name>   # worktreeを削除
 ```bash
 # tmuxセッション内で実行
 tmux
-npm run worktree:new feat my-feature --task "新しいUI要素を追加"
+npm run worktree:new -- feat my-feature --task "新しいUI要素を追加"
 ```
 
 詳細は `.claude/rules/workflow.md` の「tmux統合機能」セクションを参照。
