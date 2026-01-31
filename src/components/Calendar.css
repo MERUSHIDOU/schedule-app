@@ -80,6 +80,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 2px;
+  touch-action: pan-y; /* 垂直スクロールは許可、水平はJSで処理 */
 }
 
 .calendar-day {
