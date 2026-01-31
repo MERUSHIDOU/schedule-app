@@ -45,6 +45,7 @@ $CONTEXT_CONTENT"
         # tmuxに送信（改行を含むテキストを送信）
         sleep 1  # Claudeの完全な初期化を待つ
         tmux send-keys -t "$CURRENT_PANE" "$PROMPT"
+        sleep 1 # プロンプトを確実に送信するために
         tmux send-keys -t "$CURRENT_PANE" C-m
     fi
 fi
