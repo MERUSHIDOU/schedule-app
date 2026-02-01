@@ -2,62 +2,25 @@
 
 このファイルはプロジェクト固有の情報と設定を定義します。
 
-## Git ワークフロー（必須）
+**開発での重要事項**
 
-ブランチ命名規則とワークフローの詳細: `.claude/rules/workflow.md`
+- 質問や提案を命令されたときは、必ずファイル編集/実装はしない
+- masterブランチではファイル変更をしないでください
+- コンテキスト節約のために積極的にサブエージェントに仕事を任せてください
+
+## Git ワークフロー（必須）
 
 **すべての変更はgit worktreeを使用し、Pull Requestで提出すること。**
 
-### 主要コマンド
-
 ```bash
-# tmux統合機能付き（推奨）
-npm run worktree:new -- <type> <name> --task "タスク説明"  # worktree作成、pane分割、Claude起動
+# worktree作成（tmux統合機能付き推奨）
+npm run worktree:new -- <type> <name> --task "タスク説明"
 
-# シンプル版
-npm run worktree:new -- <type> <name>     # worktree作成のみ
-npm run worktree:list                      # worktree一覧を表示
-npm run worktree:remove -- <type> <name>   # worktreeを削除
+# 変更の提出
+/ship  # コミット、プッシュ、PR作成を自動化
 ```
 
-#### tmux統合機能について
-
-**tmuxセッション内で実行すると、自動的に以下が実行されます：**
-
-1. 新しいworktreeを作成
-2. 依存関係をインストール
-3. タスクコンテキストファイル（`.claude/worktree-context.md`）を自動生成
-4. tmux paneを水平分割（左右）で作成
-5. 新しいpaneでClaudeを起動し、タスクコンテキストを自然文で送信
-
-**利点:**
-- タスク情報がClaudeに自動送信され、適切なワークフローを自動選択
-- 複数のworktreeを並行して作業可能（各paneで独立）
-- 元のプロジェクトと新しいworktreeを左右のpaneで同時表示
-- 効率的な開発環境構築
-
-**重要:** メインエージェントがtmux統合でworktreeを作成し、タスクを移譲した場合、メインエージェントは作業を終了します。新しいpaneのClaudeセッションがタスクを引き継ぎます。
-
-**使用方法:**
-```bash
-# tmuxセッション内で実行
-tmux
-npm run worktree:new -- feat my-feature --task "新しいUI要素を追加"
-```
-
-詳細は `.claude/rules/workflow.md` の「tmux統合機能」セクションを参照。
-
-### 変更の提出
-
-```bash
-/ship  # 変更をコミット、プッシュし、Pull Requestを作成（推奨）
-```
-
-`/ship`スキルは、変更内容の確認、commit message生成、コミット、プッシュ、PR作成を自動化します。
-
-**詳細ドキュメント**:
-- `/ship`スキル: `.claude/skills/ship/SKILL.md`
-- Gitワークフロー: `.claude/rules/workflow.md`
+**詳細:** `.claude/rules/workflow.md`
 
 ## プロジェクト概要
 
@@ -84,82 +47,17 @@ npm run preview  # ビルド結果プレビュー
 
 ## 開発ワークフロー（必須）
 
-**指示出しからPR作成までの標準フロー**
+**指示出しからPR作成までの標準フローは `.claude/rules/development-workflow.md` を参照。**
 
-### 1. アーキテクチャ設計（条件付き）
+主要なステップ：
+1. アーキテクチャ設計（条件付き）- architect
+2. 実装計画策定 - `/plan`
+3. 実装 - `/tdd`
+4. コードレビュー（必須）- `/code-review`
+5. セキュリティレビュー（条件付き）- `/security-review`
+6. PR作成 - `/ship`
 
-以下の場合、architectエージェントが自動起動：
-- 新しいシステム/機能のアーキテクチャ設計
-- 大規模リファクタリング
-- 技術スタック選定
-- データモデル設計
-- スケーラビリティ検討
-
-**成果物:** アーキテクチャ決定レコード（ADR）、設計ドキュメント
-
-### 2. 実装計画策定
-
-**自動判断（推奨）:**
-```
-複雑な機能をリクエスト → Claudeが自動的にplannerエージェントを起動
-簡単な機能をリクエスト → メインエージェントが実装内容を考える
-```
-
-**明示的呼び出し:**
-```
-/plan [機能] → plannerエージェントを強制起動
-```
-
-**成果物:** 実装計画書（`plans/YYYY-MM-DD_<feature-name>.md`）
-
-### 3. 実装
-```
-/tdd [機能] → tdd-guideエージェントがテストファーストで実装
-```
-- アーキテクチャ設計・実装計画書がある場合はそれに従う
-- ない場合は直接実装
-
-### 4. コードレビュー（必須）
-```
-/code-review → セキュリティと品質の包括的レビュー
-```
-- CRITICALまたはHIGH問題がある場合は修正必須
-- 修正後、再レビュー（最大3回）
-- 3回で修正しきれない場合は人間に承認を求める
-
-### 5. セキュリティレビュー（条件付き）
-以下の場合のみ実施：
-- 変更が多い（10ファイル以上）
-- 認証・APIエンドポイント・機密データの変更
-- ユーザー入力の処理を追加
-
-```
-security-reviewerエージェントに委託
-```
-- 修正後、再レビュー（最大3回）
-
-### 6. PR作成
-```
-/ship → コミット、プッシュ、PR作成を自動化
-```
-
-**フロー図:**
-```
-指示 → [建築的判断必要?] → Yes → architectエージェント → ADR/設計
-                          ↓ No
-                          ↓
-       [複雑?] → Yes → plannerエージェント → 計画書（plans/）
-       or /plan   ↓ No
-                  ↓
-             /tdd → 実装
-                  ↓
-          /code-review → 修正（最大3回）
-                  ↓
-       [セキュリティ変更?] → Yes → security-review → 修正（最大3回）
-                          ↓ No
-                          ↓
-                      /ship → PR作成
-```
+詳細: `.claude/rules/development-workflow.md`
 
 ## 実装計画（必須）
 
