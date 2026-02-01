@@ -160,9 +160,28 @@ if [ -n "$TMUX" ]; then
         echo "  cd ${WORKTREE_DIR}"
         echo "  claude"
     else
-        # 新しいpaneでClaude起動スクリプトを実行
-        tmux send-keys -t "$PANE_ID" "bash scripts/launch-claude-with-context.sh" C-m
-        echo "✓ 新しいpaneでClaudeが起動しました"
+        # メインプロジェクトの絶対パス（コンテキストファイル参照用）
+        MAIN_PROJECT_DIR=$(cd "$(pwd)" && pwd)
+
+        # 1. Claudeをフォアグラウンドで起動
+        # --add-dirで現在のworktreeとメインプロジェクトを追加
+        tmux send-keys -t "$PANE_ID" "claude --add-dir . --add-dir ${MAIN_PROJECT_DIR}" C-m
+
+        # 2. Claudeの起動完了を待つ
+        sleep 3
+
+        # 3. コンテキストファイルの内容を読み込み
+        CONTEXT_CONTENT=$(cat "${WORKTREE_DIR}/.claude/worktree-context.md")
+
+        # 4. タスクプロンプトを作成
+        PROMPT=$'以下のタスクを実施してください：\n\n'"${CONTEXT_CONTENT}"
+
+        # 5. プロンプトをClaudeに送信（フォアグラウンドで起動しているため受信可能）
+        tmux send-keys -t "$PANE_ID" "$PROMPT"
+        sleep 1
+        tmux send-keys -t "$PANE_ID" C-m
+
+        echo "✓ 新しいpaneでClaudeが起動し、タスクコンテキストを送信しました"
         echo ""
         echo "Pane情報: ${PANE_ID}"
     fi
