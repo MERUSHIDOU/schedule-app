@@ -14,7 +14,9 @@ const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
 // 月間カレンダー表示
 export function Calendar({ schedules, selectedDate, onSelectDate }: CalendarProps) {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(() => {
+    return selectedDate ? new Date(selectedDate) : new Date();
+  });
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const days = getMonthDays(year, month);
