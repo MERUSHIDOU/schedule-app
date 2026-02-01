@@ -165,10 +165,13 @@ if [ -n "$TMUX" ]; then
 
         # 1. Claudeをフォアグラウンドで起動
         # --add-dirで現在のworktreeとメインプロジェクトを追加
-        tmux send-keys -t "$PANE_ID" "claude --add-dir . --add-dir ${MAIN_PROJECT_DIR}" C-m
+        tmux send-keys -t "$PANE_ID" "claude --add-dir ." C-m
 
         # 2. Claudeの起動完了を待つ
         sleep 3
+        # 信頼できるフォルダか？の選択
+        tmux send-keys -t "$PANE_ID" C-m
+        sleep 1
 
         # 3. コンテキストファイルの内容を読み込み
         CONTEXT_CONTENT=$(cat "${WORKTREE_DIR}/.claude/worktree-context.md")

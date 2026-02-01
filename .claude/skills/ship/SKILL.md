@@ -93,14 +93,15 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 # 実行内容:
 # 1. git status, git diffで変更を確認
 # 2. "docs: Claude設定ドキュメントを更新" というcommit messageを生成
-# 3. git add . && git commit
-# 4. git push -u origin docs/claude-config
-# 5. gh pr create でPR作成
-# 6. PR URLを返す
+# 3. git add .
+# 4. git commit
+# 5. git push -u origin docs/claude-config
+# 6. gh pr create でPR作成
+# 7. PR URLを返す
 ```
 
 ## 注意事項
-
+- **別々のgitコマンドの連結禁止**: git add && git commitなどを禁止、分ける
 - **変更内容の確認**: コミット前に必ず変更内容を表示するため、確認してください
 - **小さなPR**: 大きな変更は複数のPRに分割することを推奨
 - **テスト実行**: 重要な変更の場合は、事前にテストを実行してください
