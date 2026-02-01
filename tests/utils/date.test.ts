@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   formatDate,
+  formatDateLabel,
   formatDisplayDate,
   getMonthDays,
   getMonthName,
@@ -118,5 +119,19 @@ describe('getMonthName', () => {
     const result = getMonthName(2024, 11); // 2024年12月
     expect(result).toContain('2024');
     expect(result).toContain('12');
+  });
+});
+
+describe('formatDateLabel', () => {
+  it('YYYY-MM-DD形式の文字列をYYYY/MM/DD形式に変換する', () => {
+    expect(formatDateLabel('2024-01-01')).toBe('2024/01/01');
+  });
+
+  it('月と日の0埋めを保持する', () => {
+    expect(formatDateLabel('2024-05-09')).toBe('2024/05/09');
+  });
+
+  it('12月31日を正しく変換する', () => {
+    expect(formatDateLabel('2024-12-31')).toBe('2024/12/31');
   });
 });

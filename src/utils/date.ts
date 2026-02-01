@@ -88,3 +88,12 @@ export function getMonthName(year: number, month: number): string {
     month: 'long',
   });
 }
+
+/**
+ * YYYY-MM-DD形式の文字列をYYYY/MM/DD形式に変換
+ * @param dateStr YYYY-MM-DD形式の日付文字列
+ * @returns YYYY/MM/DD形式の日付文字列
+ */
+export function formatDateLabel(dateStr: string): string {
+  return dateStr.replace(/-/g, '/');
+}
