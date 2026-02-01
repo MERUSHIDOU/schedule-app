@@ -1,4 +1,5 @@
 import type { Schedule } from '../types/schedule';
+import { formatDateLabel } from '../utils/date';
 import { hasMoreThanLines } from '../utils/textUtils';
 import './ScheduleList.css';
 
@@ -17,6 +18,7 @@ export function ScheduleList({ schedules, selectedDate, onEdit, onDelete }: Sche
 
   return (
     <div className="schedule-list">
+      <div className="schedule-list-date">{formatDateLabel(selectedDate)}</div>
       {filteredSchedules.length === 0 ? (
         <p className="no-schedules">予定がありません</p>
       ) : (

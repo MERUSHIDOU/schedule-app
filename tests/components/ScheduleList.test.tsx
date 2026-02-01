@@ -155,4 +155,53 @@ describe('ScheduleList', () => {
       expect(descriptions).toHaveLength(1);
     });
   });
+
+  describe('日付ラベル', () => {
+    it('リストの左上にYYYY/MM/DD形式で日付が表示される', () => {
+      const schedules = [createSchedule()];
+
+      render(
+        <ScheduleList
+          schedules={schedules}
+          selectedDate="2024-01-01"
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+        />
+      );
+
+      const dateLabel = screen.getByText('2024/01/01');
+      expect(dateLabel).toBeInTheDocument();
+      expect(dateLabel).toHaveClass('schedule-list-date');
+    });
+
+    it('異なる日付でも正しく表示される', () => {
+      const schedules = [createSchedule({ date: '2024-12-31' })];
+
+      render(
+        <ScheduleList
+          schedules={schedules}
+          selectedDate="2024-12-31"
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+        />
+      );
+
+      const dateLabel = screen.getByText('2024/12/31');
+      expect(dateLabel).toBeInTheDocument();
+    });
+
+    it('予定がない場合でも日付ラベルは表示される', () => {
+      render(
+        <ScheduleList
+          schedules={[]}
+          selectedDate="2024-06-15"
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+        />
+      );
+
+      const dateLabel = screen.getByText('2024/06/15');
+      expect(dateLabel).toBeInTheDocument();
+    });
+  });
 });
