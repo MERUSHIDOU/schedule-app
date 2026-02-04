@@ -23,3 +23,8 @@ export interface ScheduleFormData {
 
 // 表示モード(月/週/日)
 export type ViewMode = 'month' | 'week' | 'day';
+
+// アプリケーション設定
+export interface AppSettings {
+  showHolidays: boolean;
+}

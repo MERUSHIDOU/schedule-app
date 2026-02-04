@@ -143,10 +143,34 @@
   color: white;
 }
 
+.calendar-day.holiday {
+  background: #fef2f2;
+}
+
+.calendar-day.holiday .day-number {
+  color: #ef4444;
+}
+
+.calendar-day.today.holiday .day-number {
+  color: white;
+}
+
 .day-number {
   font-size: 0.875rem;
   font-weight: 500;
   color: #374151;
+}
+
+.holiday-name {
+  font-size: 0.625rem;
+  color: #ef4444;
+  margin-top: 2px;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .schedule-dots {
@@ -185,5 +209,9 @@
   .calendar-day.today .day-number {
     width: 24px;
     height: 24px;
+  }
+
+  .holiday-name {
+    font-size: 0.55rem;
   }
 }

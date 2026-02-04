@@ -2,18 +2,25 @@ import { useState } from 'react';
 import { useSwipe } from '../hooks/useSwipe';
 import type { Schedule } from '../types/schedule';
 import { formatDate, getMonthDays, getMonthName, isToday } from '../utils/date';
+import { getHolidayName } from '../utils/holidays';
 import './Calendar.css';
 
 interface CalendarProps {
   schedules: Schedule[];
   selectedDate: string;
   onSelectDate: (date: string) => void;
+  showHolidays?: boolean;
 }
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
 // 月間カレンダー表示
-export function Calendar({ schedules, selectedDate, onSelectDate }: CalendarProps) {
+export function Calendar({
+  schedules,
+  selectedDate,
+  onSelectDate,
+  showHolidays = true,
+}: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(() => {
     return selectedDate ? new Date(selectedDate) : new Date();
   });
@@ -94,6 +101,8 @@ export function Calendar({ schedules, selectedDate, onSelectDate }: CalendarProp
           const isCurrentMonth = date.getMonth() === month;
           const isSunday = date.getDay() === 0;
           const isSaturday = date.getDay() === 6;
+          const holidayName = showHolidays ? getHolidayName(dateStr) : null;
+          const isHoliday = holidayName !== null;
 
           return (
             <button
@@ -103,10 +112,12 @@ export function Calendar({ schedules, selectedDate, onSelectDate }: CalendarProp
                 isToday(date) ? 'today' : ''
               } ${selectedDate === dateStr ? 'selected' : ''} ${
                 isSunday ? 'sunday' : ''
-              } ${isSaturday ? 'saturday' : ''}`}
+              } ${isSaturday ? 'saturday' : ''} ${isHoliday ? 'holiday' : ''}`}
               onClick={() => onSelectDate(dateStr)}
+              data-date={dateStr}
             >
               <span className="day-number">{date.getDate()}</span>
+              {holidayName && <span className="holiday-name">{holidayName}</span>}
               {daySchedules.length > 0 && (
                 <div className="schedule-dots">
                   {daySchedules.slice(0, 3).map(schedule => (

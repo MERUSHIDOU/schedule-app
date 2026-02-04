@@ -2,14 +2,17 @@ import { useState } from 'react';
 import { Calendar } from './components/Calendar';
 import { ScheduleForm } from './components/ScheduleForm';
 import { ScheduleList } from './components/ScheduleList';
+import { SettingsMenu } from './components/SettingsMenu';
 import { VersionInfo } from './components/VersionInfo';
 import { useSchedules } from './hooks/useSchedules';
+import { useSettings } from './hooks/useSettings';
 import type { Schedule, ScheduleFormData } from './types/schedule';
 import { formatDate } from './utils/date';
 import './App.css';
 
 function App() {
   const { schedules, addSchedule, updateSchedule, deleteSchedule } = useSchedules();
+  const { settings, updateSettings } = useSettings();
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
@@ -48,10 +51,19 @@ function App() {
     setEditingSchedule(null);
   };
 
+  // 祝日表示のトグル
+  const handleToggleHolidays = (value: boolean) => {
+    updateSettings({ showHolidays: value });
+  };
+
   return (
     <div className="app">
       <header className="app-header">
         <h1>スケジュール</h1>
+        <SettingsMenu
+          showHolidays={settings.showHolidays}
+          onToggleHolidays={handleToggleHolidays}
+        />
         <VersionInfo />
       </header>
 
@@ -60,6 +72,7 @@ function App() {
           schedules={schedules}
           selectedDate={selectedDate}
           onSelectDate={setSelectedDate}
+          showHolidays={settings.showHolidays}
         />
 
         <ScheduleList

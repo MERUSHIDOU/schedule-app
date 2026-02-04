@@ -373,4 +373,79 @@ describe('Calendar', () => {
       });
     });
   });
+
+  describe('祝日表示機能', () => {
+    it('showHolidaysがtrueの時に祝日名が表示されること', () => {
+      render(
+        <Calendar
+          schedules={mockSchedules}
+          selectedDate="2026-01-01"
+          onSelectDate={mockOnSelectDate}
+          showHolidays={true}
+        />
+      );
+
+      // 元日が表示されていることを確認
+      expect(screen.getByText('元日')).toBeInTheDocument();
+    });
+
+    it('showHolidaysがfalseの時に祝日名が非表示であること', () => {
+      render(
+        <Calendar
+          schedules={mockSchedules}
+          selectedDate="2026-01-01"
+          onSelectDate={mockOnSelectDate}
+          showHolidays={false}
+        />
+      );
+
+      // 元日が表示されていないことを確認
+      expect(screen.queryByText('元日')).not.toBeInTheDocument();
+    });
+
+    it('showHolidaysが未指定の時にデフォルトでtrueとして動作すること', () => {
+      render(
+        <Calendar
+          schedules={mockSchedules}
+          selectedDate="2026-01-01"
+          onSelectDate={mockOnSelectDate}
+        />
+      );
+
+      // デフォルトで祝日が表示されることを確認
+      expect(screen.getByText('元日')).toBeInTheDocument();
+    });
+
+    it('祝日の日にholidayクラスが付与されること', () => {
+      const { container } = render(
+        <Calendar
+          schedules={mockSchedules}
+          selectedDate="2026-01-01"
+          onSelectDate={mockOnSelectDate}
+          showHolidays={true}
+        />
+      );
+
+      // 1月1日のセルを取得
+      const holidayCell = container.querySelector('[data-date="2026-01-01"]');
+      expect(holidayCell).toHaveClass('calendar-day');
+      expect(holidayCell).toHaveClass('holiday');
+    });
+
+    it('祝日でない日にholidayクラスが付与されないこと', () => {
+      const { container } = render(
+        <Calendar
+          schedules={mockSchedules}
+          selectedDate="2026-01-02"
+          onSelectDate={mockOnSelectDate}
+          showHolidays={true}
+        />
+      );
+
+      // 1月2日のセルを取得
+      const normalCell = container.querySelector('[data-date="2026-01-02"]');
+      expect(normalCell).toHaveClass('calendar-day');
+      expect(normalCell).not.toHaveClass('holiday');
+    });
+  });
 });

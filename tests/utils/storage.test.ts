@@ -1,6 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Schedule } from '../../src/types/schedule';
-import { generateId, loadSchedules, saveSchedules } from '../../src/utils/storage';
+import {
+  generateId,
+  loadSchedules,
+  loadSettings,
+  saveSchedules,
+  saveSettings,
+} from '../../src/utils/storage';
 
 const mockSchedule: Schedule = {
   id: '1',
@@ -88,5 +94,61 @@ describe('generateId', () => {
   it('IDが空でない', () => {
     const id = generateId();
     expect(id.length).toBeGreaterThan(0);
+  });
+});
+
+describe('loadSettings', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('デフォルト値を返すこと', () => {
+    const result = loadSettings();
+    expect(result).toEqual({ showHolidays: true });
+  });
+
+  it('保存済みデータが正しく読み込まれること', () => {
+    localStorage.setItem('schedule-app-settings', JSON.stringify({ showHolidays: false }));
+
+    const result = loadSettings();
+    expect(result).toEqual({ showHolidays: false });
+  });
+
+  it('不正なデータの場合デフォルト値にフォールバックすること', () => {
+    localStorage.setItem('schedule-app-settings', 'invalid json');
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const result = loadSettings();
+    expect(result).toEqual({ showHolidays: true });
+    expect(consoleSpy).toHaveBeenCalled();
+
+    consoleSpy.mockRestore();
+  });
+
+  it('不完全なデータの場合デフォルト値にフォールバックすること', () => {
+    localStorage.setItem('schedule-app-settings', JSON.stringify({}));
+
+    const result = loadSettings();
+    expect(result).toEqual({ showHolidays: true });
+  });
+});
+
+describe('saveSettings', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('正しく保存されること', () => {
+    saveSettings({ showHolidays: false });
+
+    const saved = localStorage.getItem('schedule-app-settings');
+    expect(saved).toBe(JSON.stringify({ showHolidays: false }));
+  });
+
+  it('デフォルト値を保存できること', () => {
+    saveSettings({ showHolidays: true });
+
+    const saved = localStorage.getItem('schedule-app-settings');
+    expect(saved).toBe(JSON.stringify({ showHolidays: true }));
   });
 });

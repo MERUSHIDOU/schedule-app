@@ -1,0 +1,143 @@
+.settings-menu {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.settings-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.9);
+  /* iOS: タッチフィードバック改善 */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: background-color 0.2s;
+}
+
+.settings-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.settings-button:active {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.settings-icon {
+  flex-shrink: 0;
+}
+
+.settings-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+  padding: 8px;
+  z-index: 1000;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  /* iOS: タッチフィードバック改善 */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.settings-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.settings-label {
+  font-size: 0.9rem;
+  color: #333;
+  user-select: none;
+}
+
+.settings-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.settings-toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  background-color: #ccc;
+  border-radius: 12px;
+  transition: background-color 0.3s;
+  flex-shrink: 0;
+}
+
+.settings-toggle::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: white;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.3s;
+}
+
+.settings-checkbox:checked + .settings-toggle {
+  background-color: #3b82f6;
+}
+
+.settings-checkbox:checked + .settings-toggle::after {
+  transform: translateX(20px);
+}
+
+@media (max-width: 480px) {
+  .settings-button {
+    width: 28px;
+    height: 28px;
+  }
+
+  .settings-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .settings-dropdown {
+    min-width: 160px;
+  }
+
+  .settings-label {
+    font-size: 0.85rem;
+  }
+
+  .settings-toggle {
+    width: 40px;
+    height: 22px;
+  }
+
+  .settings-toggle::after {
+    width: 16px;
+    height: 16px;
+  }
+
+  .settings-checkbox:checked + .settings-toggle::after {
+    transform: translateX(18px);
+  }
+}

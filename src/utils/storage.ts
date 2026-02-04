@@ -1,6 +1,7 @@
-import type { Schedule } from '../types/schedule';
+import type { AppSettings, Schedule } from '../types/schedule';
 
 const STORAGE_KEY = 'schedule-app-data';
+const SETTINGS_STORAGE_KEY = 'schedule-app-settings';
 
 // localStorageからスケジュールをロード
 export function loadSchedules(): Schedule[] {
@@ -31,4 +32,35 @@ export function generateId(): string {
 // localStorageにスケジュールデータが存在するかチェック
 export function hasStorageData(): boolean {
   return localStorage.getItem(STORAGE_KEY) !== null;
+}
+
+// localStorageから設定をロード
+export function loadSettings(): AppSettings {
+  const defaultSettings: AppSettings = {
+    showHolidays: true,
+  };
+
+  try {
+    const data = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (data) {
+      const parsed = JSON.parse(data);
+      // 不完全なデータの場合はデフォルト値を使用
+      if (typeof parsed.showHolidays !== 'boolean') {
+        return defaultSettings;
+      }
+      return parsed as AppSettings;
+    }
+  } catch (error) {
+    console.error('Failed to load settings:', error);
+  }
+  return defaultSettings;
+}
+
+// localStorageに設定を保存
+export function saveSettings(settings: AppSettings): void {
+  try {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  } catch (error) {
+    console.error('Failed to save settings:', error);
+  }
 }
