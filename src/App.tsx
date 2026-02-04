@@ -22,12 +22,16 @@ function App() {
 
   // 既存スケジュールの編集ボタン押したとき
   const handleEdit = (schedule: Schedule) => {
+    // 祝日は編集不可（防御的プログラミング）
+    if (schedule.isHoliday) return;
     setEditingSchedule(schedule);
     setIsFormOpen(true);
   };
 
   // 既存スケジュールの削除ボタンを押したとき
   const handleDelete = (id: string) => {
+    // 祝日は削除不可（防御的プログラミング）
+    if (id.startsWith('holiday-')) return;
     if (window.confirm('この予定を削除しますか？')) {
       deleteSchedule(id);
     }
@@ -70,7 +74,7 @@ function App() {
         />
       </main>
 
-      <button className="fab" onClick={handleAddClick} aria-label="予定を追加">
+      <button type="button" className="fab" onClick={handleAddClick} aria-label="予定を追加">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />

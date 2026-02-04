@@ -1,6 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Schedule } from '../../src/types/schedule';
-import { generateId, loadSchedules, saveSchedules } from '../../src/utils/storage';
+import {
+  generateId,
+  loadSchedules,
+  loadSettings,
+  saveSchedules,
+  saveSettings,
+} from '../../src/utils/storage';
 
 const mockSchedule: Schedule = {
   id: '1',
@@ -88,5 +94,43 @@ describe('generateId', () => {
   it('IDが空でない', () => {
     const id = generateId();
     expect(id.length).toBeGreaterThan(0);
+  });
+});
+
+describe('loadSettings', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('空の設定オブジェクトを返すこと', () => {
+    const result = loadSettings();
+    expect(result).toEqual({});
+  });
+
+  it('localStorageに設定があっても空オブジェクトを返すこと', () => {
+    localStorage.setItem('schedule-app-settings', JSON.stringify({ showHolidays: false }));
+
+    const result = loadSettings();
+    expect(result).toEqual({});
+  });
+
+  it('不正なデータの場合も空オブジェクトを返すこと', () => {
+    localStorage.setItem('schedule-app-settings', 'invalid json');
+
+    const result = loadSettings();
+    expect(result).toEqual({});
+  });
+});
+
+describe('saveSettings', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('何も保存しないこと', () => {
+    saveSettings({});
+
+    const saved = localStorage.getItem('schedule-app-settings');
+    expect(saved).toBeNull();
   });
 });

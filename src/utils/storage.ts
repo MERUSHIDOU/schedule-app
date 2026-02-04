@@ -1,4 +1,4 @@
-import type { Schedule } from '../types/schedule';
+import type { AppSettings, Schedule } from '../types/schedule';
 
 const STORAGE_KEY = 'schedule-app-data';
 
@@ -31,4 +31,14 @@ export function generateId(): string {
 // localStorageにスケジュールデータが存在するかチェック
 export function hasStorageData(): boolean {
   return localStorage.getItem(STORAGE_KEY) !== null;
+}
+
+// localStorageから設定をロード（設定項目がなくなったため空オブジェクトを返す）
+export function loadSettings(): AppSettings {
+  return {};
+}
+
+// localStorageに設定を保存（設定項目がなくなったため何もしない）
+export function saveSettings(_settings: AppSettings): void {
+  // 設定項目がないため何もしない
 }

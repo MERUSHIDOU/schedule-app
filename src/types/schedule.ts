@@ -9,6 +9,7 @@ export interface Schedule {
   color: string;
   createdAt: string;
   updatedAt: string;
+  isHoliday?: boolean;
 }
 
 // スケジュール編集フォームで取り扱う
@@ -23,3 +24,6 @@ export interface ScheduleFormData {
 
 // 表示モード(月/週/日)
 export type ViewMode = 'month' | 'week' | 'day';
+
+// アプリケーション設定
+export type AppSettings = {};
