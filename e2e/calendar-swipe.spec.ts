@@ -1,11 +1,13 @@
 import { expect, test } from '@playwright/test';
+import { ScheduleHelper } from './helpers/schedule-helper';
 
 test.describe('カレンダーフリック操作の設定', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+  let helper: ScheduleHelper;
 
-    // カレンダーが読み込まれるまで待機
-    await expect(page.locator('.calendar')).toBeVisible();
+  test.beforeEach(async ({ page }) => {
+    helper = new ScheduleHelper(page);
+    await page.goto('/');
+    await expect(helper.calendar).toBeVisible();
   });
 
   test('aria-labelが設定されている', async ({ page }) => {
@@ -30,74 +32,60 @@ test.describe('カレンダーフリック操作の設定', () => {
     expect(touchAction).toBe('pan-y');
   });
 
-  test('既存のボタン操作が正常に動作する', async ({ page }) => {
-    const initialMonth = await page.locator('.month-title').textContent();
+  test('既存のボタン操作が正常に動作する', async () => {
+    const initialMonth = await helper.monthTitle.textContent();
     expect(initialMonth).toBeTruthy();
 
     // 次月ボタンで移動
-    await page.locator('[aria-label="次月"]').click();
-    await page.waitForTimeout(100);
-    const month1 = await page.locator('.month-title').textContent();
-    expect(month1).not.toBe(initialMonth);
+    await helper.nextMonthButton.click();
+    await expect(helper.monthTitle).not.toHaveText(initialMonth!);
+    const month1 = await helper.monthTitle.textContent();
 
     // 前月ボタンで戻る
-    await page.locator('[aria-label="前月"]').click();
-    await page.waitForTimeout(100);
-    const month2 = await page.locator('.month-title').textContent();
-    expect(month2).toBe(initialMonth);
+    await helper.prevMonthButton.click();
+    await expect(helper.monthTitle).toHaveText(initialMonth!);
 
     // 「今日」ボタンで今月に戻る
-    await page.locator('.today-btn').click();
-    await page.waitForTimeout(100);
-    const todayMonth = await page.locator('.month-title').textContent();
+    // まず別の月へ移動
+    await helper.nextMonthButton.click();
+    await expect(helper.monthTitle).not.toHaveText(initialMonth!);
+    await helper.todayButton.click();
+    const todayMonth = await helper.monthTitle.textContent();
     expect(todayMonth).toBeTruthy();
-  });
-
-  test('カレンダーグリッドにタッチイベントハンドラが設定されている', async ({ page }) => {
-    const hasHandlers = await page.evaluate(() => {
-      const grid = document.querySelector('.calendar-grid');
-      if (!grid) return false;
-
-      // onTouchStart, onTouchMove, onTouchEndがReactによって設定されているか確認
-      const hasOnTouchStart = grid.hasAttribute('data-testid') || true; // Reactハンドラは属性として見えないので、要素の存在のみ確認
-      return hasOnTouchStart;
-    });
-
-    expect(hasHandlers).toBeTruthy();
   });
 });
 
 test.describe('カレンダー機能の互換性', () => {
+  let helper: ScheduleHelper;
+
   test.beforeEach(async ({ page }) => {
+    helper = new ScheduleHelper(page);
     await page.goto('/');
-    await expect(page.locator('.calendar')).toBeVisible();
+    await expect(helper.calendar).toBeVisible();
   });
 
-  test('複数月の移動が可能', async ({ page }) => {
-    const initialMonth = await page.locator('.month-title').textContent();
+  test('複数月の移動が可能', async () => {
+    const initialMonth = await helper.monthTitle.textContent();
 
     // 次月へ3回移動
     for (let i = 0; i < 3; i++) {
-      await page.locator('[aria-label="次月"]').click();
-      await page.waitForTimeout(100);
+      await helper.nextMonthButton.click();
     }
 
-    const month1 = await page.locator('.month-title').textContent();
-    expect(month1).not.toBe(initialMonth);
+    // 3ヶ月後は元の月と異なることを確認
+    await expect(helper.monthTitle).not.toHaveText(initialMonth!);
 
-    // 前月へ3回移動
+    // 前月へ3回移動して元に戻る
     for (let i = 0; i < 3; i++) {
-      await page.locator('[aria-label="前月"]').click();
-      await page.waitForTimeout(100);
+      await helper.prevMonthButton.click();
     }
 
-    const month2 = await page.locator('.month-title').textContent();
-    expect(month2).toBe(initialMonth);
+    await expect(helper.monthTitle).toHaveText(initialMonth!);
   });
 
   test('日付選択が正常に動作する', async ({ page }) => {
-    // カレンダー上の日付をクリック
-    const firstDay = page.locator('.calendar-day').first();
+    // 当月の日付をクリック（other-monthを避ける）
+    const firstDay = helper.currentMonthDays.first();
     await firstDay.click();
 
     // 選択されたスタイルが適用される

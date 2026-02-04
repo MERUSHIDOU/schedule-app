@@ -1,22 +1,30 @@
 import { expect, test } from '@playwright/test';
+import { ScheduleHelper } from './helpers/schedule-helper';
 
+/**
+ * モバイル/レスポンシブテスト
+ *
+ * 注: 基本的なCRUD操作テストは schedule-app.spec.ts でカバーされているため、
+ * このファイルではモバイル固有の以下のテストに焦点を当てる:
+ * - ビューポートへのフィット
+ * - タッチ（タップ）操作
+ * - タップ可能なサイズの確認
+ */
 test.describe('モバイル/レスポンシブテスト', () => {
+  let helper: ScheduleHelper;
+
   test.beforeEach(async ({ page }) => {
-    // ローカルストレージをクリア
-    await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
-    await page.reload();
+    helper = new ScheduleHelper(page);
+    await helper.resetApp();
   });
 
   test('モバイルビューポートでアプリが正しく表示される', async ({ page }) => {
-    // アプリの主要要素が表示されていることを確認
     await expect(page.getByRole('heading', { name: 'スケジュール' })).toBeVisible();
-    await expect(page.locator('.calendar')).toBeVisible();
-    await expect(page.getByRole('button', { name: '予定を追加' })).toBeVisible();
+    await expect(helper.calendar).toBeVisible();
+    await expect(helper.addButton).toBeVisible();
 
     // FABボタンが画面内に収まっていることを確認
-    const fabButton = page.getByRole('button', { name: '予定を追加' });
-    const fabBox = await fabButton.boundingBox();
+    const fabBox = await helper.addButton.boundingBox();
     const viewportSize = page.viewportSize();
 
     expect(fabBox).not.toBeNull();
@@ -29,68 +37,46 @@ test.describe('モバイル/レスポンシブテスト', () => {
   });
 
   test('カレンダーがモバイル幅に収まっている', async ({ page }) => {
-    const calendar = page.locator('.calendar');
-    await expect(calendar).toBeVisible();
+    await expect(helper.calendar).toBeVisible();
 
-    const calendarBox = await calendar.boundingBox();
+    const calendarBox = await helper.calendar.boundingBox();
     const viewportSize = page.viewportSize();
 
     expect(calendarBox).not.toBeNull();
     if (calendarBox && viewportSize) {
-      // カレンダーが画面幅を超えていないことを確認
       expect(calendarBox.width).toBeLessThanOrEqual(viewportSize.width);
     }
   });
 
-  test('タッチ操作でFABボタンをタップしてフォームを開ける', async ({ page }) => {
-    // FABボタンをタップ
-    const fabButton = page.getByRole('button', { name: '予定を追加' });
-    await fabButton.tap();
-
-    // フォームが表示される
-    await expect(page.getByRole('heading', { name: '新しい予定' })).toBeVisible();
+  test('タッチ操作でFABボタンをタップしてフォームを開ける', async () => {
+    await helper.addButton.tap();
+    await expect(helper.newScheduleHeading).toBeVisible();
   });
 
-  test('タッチ操作でカレンダーの日付を選択できる', async ({ page }) => {
-    const calendar = page.locator('.calendar');
-    await expect(calendar).toBeVisible();
+  test('タッチ操作でカレンダーの日付を選択できる', async () => {
+    await expect(helper.calendar).toBeVisible();
 
-    // 今日以外の日付をタップ
-    const dateButton = calendar
+    const dateButton = helper.calendar
       .locator('button.calendar-day:not(.today):not(.other-month)')
       .first();
     await dateButton.tap();
-
-    // 日付が選択されたことを確認
     await expect(dateButton).toHaveClass(/selected/);
   });
 
-  test('モバイルでスケジュールを追加できる', async ({ page }) => {
-    // FABボタンをタップ
-    await page.getByRole('button', { name: '予定を追加' }).tap();
+  test('モバイルでスケジュールをタップ操作で追加できる', async () => {
+    await helper.addScheduleByTap({
+      title: 'モバイルテストスケジュール',
+      startTime: '10:00',
+      endTime: '11:00',
+    });
 
-    // フォームに入力
-    await page.getByLabel('タイトル *').fill('モバイルテストスケジュール');
-    await page.getByLabel('開始時刻').selectOption('10:00');
-    await page.getByLabel('終了時刻').selectOption('11:00');
-
-    // 追加ボタンをタップ
-    await page.locator('.modal-content .btn-submit').tap();
-
-    // スケジュールが追加される
-    await expect(
-      page.locator('.schedule-item .schedule-title', { hasText: 'モバイルテストスケジュール' })
-    ).toBeVisible();
+    await expect(helper.getScheduleTitle('モバイルテストスケジュール')).toBeVisible();
   });
 
   test('モーダルがモバイル画面に適切に表示される', async ({ page }) => {
-    // FABボタンをタップ
-    await page.getByRole('button', { name: '予定を追加' }).tap();
+    await helper.addButton.tap();
+    await expect(helper.newScheduleHeading).toBeVisible();
 
-    // モーダルが表示される
-    await expect(page.getByRole('heading', { name: '新しい予定' })).toBeVisible();
-
-    // モーダルコンテンツが画面内に収まっていることを確認
     const modalContent = page.locator('.modal-content');
     const modalBox = await modalContent.boundingBox();
     const viewportSize = page.viewportSize();
@@ -103,19 +89,16 @@ test.describe('モバイル/レスポンシブテスト', () => {
     }
   });
 
-  test('スケジュールリストがモバイルで正しく表示される', async ({ page }) => {
-    // スケジュールを追加
-    await page.getByRole('button', { name: '予定を追加' }).tap();
-    await page.getByLabel('タイトル *').fill('リスト表示テスト');
-    await page.getByLabel('開始時刻').selectOption('10:00');
-    await page.getByLabel('終了時刻').selectOption('11:00');
-    await page.locator('.modal-content .btn-submit').tap();
+  test('スケジュールリストがモバイルで画面幅を超えない', async ({ page }) => {
+    await helper.addScheduleByTap({
+      title: 'リスト表示テスト',
+      startTime: '10:00',
+      endTime: '11:00',
+    });
 
-    // スケジュールアイテムが表示される
-    const scheduleItem = page.locator('.schedule-item', { hasText: 'リスト表示テスト' });
+    const scheduleItem = helper.getScheduleItem('リスト表示テスト');
     await expect(scheduleItem).toBeVisible();
 
-    // アイテムが画面幅に収まっている
     const itemBox = await scheduleItem.boundingBox();
     const viewportSize = page.viewportSize();
 
@@ -125,22 +108,20 @@ test.describe('モバイル/レスポンシブテスト', () => {
     }
   });
 
-  test('編集・削除ボタンがモバイルでタップ可能なサイズである', async ({ page }) => {
-    // スケジュールを追加
-    await page.getByRole('button', { name: '予定を追加' }).tap();
-    await page.getByLabel('タイトル *').fill('ボタンサイズテスト');
-    await page.getByLabel('開始時刻').selectOption('10:00');
-    await page.getByLabel('終了時刻').selectOption('11:00');
-    await page.locator('.modal-content .btn-submit').tap();
+  test('編集・削除ボタンがモバイルでタップ可能なサイズである', async () => {
+    await helper.addScheduleByTap({
+      title: 'ボタンサイズテスト',
+      startTime: '10:00',
+      endTime: '11:00',
+    });
 
-    const scheduleItem = page.locator('.schedule-item', { hasText: 'ボタンサイズテスト' });
+    const scheduleItem = helper.getScheduleItem('ボタンサイズテスト');
 
-    // 編集ボタンのサイズを確認（最小44x44pxを推奨）
+    // 編集ボタンのサイズを確認（最小タップ可能サイズ: 20px以上）
     const editButton = scheduleItem.getByRole('button', { name: '編集' });
     const editBox = await editButton.boundingBox();
     expect(editBox).not.toBeNull();
     if (editBox) {
-      // 最小タップ可能サイズ（44px未満でも許容するが、警告として記録）
       expect(editBox.width).toBeGreaterThan(20);
       expect(editBox.height).toBeGreaterThan(20);
     }
@@ -155,193 +136,67 @@ test.describe('モバイル/レスポンシブテスト', () => {
     }
   });
 
-  test('モバイルで編集ボタンをタップして編集できる', async ({ page }) => {
-    // スケジュールを追加
-    await page.getByRole('button', { name: '予定を追加' }).tap();
-    await page.getByLabel('タイトル *').fill('編集前のタイトル');
-    await page.getByLabel('開始時刻').selectOption('10:00');
-    await page.getByLabel('終了時刻').selectOption('11:00');
-    await page.locator('.modal-content .btn-submit').tap();
+  test('モバイルで編集ボタンをタップして編集できる', async () => {
+    await helper.addScheduleByTap({
+      title: '編集前のタイトル',
+      startTime: '10:00',
+      endTime: '11:00',
+    });
 
     // 編集ボタンをタップ
-    const scheduleItem = page.locator('.schedule-item', { hasText: '編集前のタイトル' });
-    await scheduleItem.getByRole('button', { name: '編集' }).tap();
-
-    // 編集フォームが表示される
-    await expect(page.getByRole('heading', { name: '予定を編集' })).toBeVisible();
+    await helper.getScheduleItem('編集前のタイトル').getByRole('button', { name: '編集' }).tap();
+    await expect(helper.editScheduleHeading).toBeVisible();
 
     // タイトルを変更
-    await page.getByLabel('タイトル *').clear();
-    await page.getByLabel('タイトル *').fill('編集後のタイトル');
-    await page.locator('.modal-content .btn-submit').tap();
+    await helper.titleInput.clear();
+    await helper.titleInput.fill('編集後のタイトル');
+    await helper.submitButton.tap();
 
-    // 変更が反映される
-    await expect(
-      page.locator('.schedule-item .schedule-title', { hasText: '編集後のタイトル' })
-    ).toBeVisible();
+    await expect(helper.getScheduleTitle('編集後のタイトル')).toBeVisible();
   });
 
   test('モバイルで削除ボタンをタップして削除できる', async ({ page }) => {
-    // スケジュールを追加
-    await page.getByRole('button', { name: '予定を追加' }).tap();
-    await page.getByLabel('タイトル *').fill('削除するスケジュール');
-    await page.getByLabel('開始時刻').selectOption('10:00');
-    await page.getByLabel('終了時刻').selectOption('11:00');
-    await page.locator('.modal-content .btn-submit').tap();
+    await helper.addScheduleByTap({
+      title: '削除するスケジュール',
+      startTime: '10:00',
+      endTime: '11:00',
+    });
 
-    // 削除確認ダイアログを許可
     page.on('dialog', async dialog => {
       await dialog.accept();
     });
 
-    // 削除ボタンをタップ
-    const scheduleItem = page.locator('.schedule-item', { hasText: '削除するスケジュール' });
-    await scheduleItem.getByRole('button', { name: '削除' }).tap();
+    await helper
+      .getScheduleItem('削除するスケジュール')
+      .getByRole('button', { name: '削除' })
+      .tap();
 
-    // スケジュールが削除される
-    await expect(
-      page.locator('.schedule-item .schedule-title', { hasText: '削除するスケジュール' })
-    ).not.toBeVisible();
-    await expect(page.getByText('予定がありません')).toBeVisible();
-  });
-
-  test('モバイルでカレンダーの前月/次月ボタンが動作する', async ({ page }) => {
-    const calendar = page.locator('.calendar');
-    await expect(calendar).toBeVisible();
-
-    const monthTitle = page.locator('.month-title');
-    const initialMonth = await monthTitle.textContent();
-
-    // 次月ボタンをタップ
-    await page.getByRole('button', { name: '次月' }).tap();
-    const nextMonth = await monthTitle.textContent();
-    expect(nextMonth).not.toBe(initialMonth);
-
-    // 前月ボタンをタップ
-    await page.getByRole('button', { name: '前月' }).tap();
-    const currentMonth = await monthTitle.textContent();
-    expect(currentMonth).toBe(initialMonth);
-  });
-
-  test('モバイルで今日ボタンが動作する', async ({ page }) => {
-    const calendar = page.locator('.calendar');
-    await expect(calendar).toBeVisible();
-
-    // 別の月に移動
-    await page.getByRole('button', { name: '次月' }).tap();
-    await page.getByRole('button', { name: '次月' }).tap();
-
-    // 今日ボタンをタップ
-    await page.getByRole('button', { name: '今日' }).tap();
-
-    // 今日が選択されている
-    const todayButton = calendar.locator('button.calendar-day.today');
-    await expect(todayButton).toHaveClass(/selected/);
-  });
-
-  test('フォームのセレクトボックスがモバイルで操作できる', async ({ page }) => {
-    // FABボタンをタップ
-    await page.getByRole('button', { name: '予定を追加' }).tap();
-
-    // タイトルを入力
-    await page.getByLabel('タイトル *').fill('セレクトボックステスト');
-
-    // 開始時刻を選択
-    const startTimeSelect = page.getByLabel('開始時刻');
-    await startTimeSelect.selectOption('14:30');
-    await expect(startTimeSelect).toHaveValue('14:30');
-
-    // 終了時刻を選択
-    const endTimeSelect = page.getByLabel('終了時刻');
-    await endTimeSelect.selectOption('16:00');
-    await expect(endTimeSelect).toHaveValue('16:00');
-
-    // 追加
-    await page.locator('.modal-content .btn-submit').tap();
-
-    // 正しい時刻でスケジュールが追加される
-    await expect(
-      page
-        .locator('.schedule-item', { hasText: 'セレクトボックステスト' })
-        .locator('.schedule-time')
-    ).toContainText('14:30 - 16:00');
-  });
-
-  test('カラーピッカーがモバイルでタップ操作できる', async ({ page }) => {
-    // FABボタンをタップ
-    await page.getByRole('button', { name: '予定を追加' }).tap();
-
-    // カラーピッカーが表示される
-    const colorOptions = page.locator('.color-picker .color-option');
-    await expect(colorOptions.first()).toBeVisible();
-
-    // 3番目の色をタップ
-    await colorOptions.nth(2).tap();
-    await expect(colorOptions.nth(2)).toHaveClass(/selected/);
-
-    // タイトルと時刻を入力
-    await page.getByLabel('タイトル *').fill('カラーピッカーテスト');
-    await page.getByLabel('開始時刻').selectOption('10:00');
-    await page.getByLabel('終了時刻').selectOption('11:00');
-
-    // 追加
-    await page.locator('.modal-content .btn-submit').tap();
-
-    // スケジュールが追加される
-    await expect(
-      page.locator('.schedule-item .schedule-title', { hasText: 'カラーピッカーテスト' })
-    ).toBeVisible();
+    await expect(helper.getScheduleTitle('削除するスケジュール')).not.toBeVisible();
+    await expect(helper.noSchedulesText).toBeVisible();
   });
 
   test('モーダルオーバーレイをタップするとモーダルが閉じる', async ({ page }) => {
-    // FABボタンをタップ
-    await page.getByRole('button', { name: '予定を追加' }).tap();
-
-    // モーダルが表示される
-    await expect(page.getByRole('heading', { name: '新しい予定' })).toBeVisible();
+    await helper.addButton.tap();
+    await expect(helper.newScheduleHeading).toBeVisible();
 
     // オーバーレイをタップ（左上隅）
     await page.locator('.modal-overlay').tap({ position: { x: 10, y: 10 } });
-
-    // モーダルが閉じる
-    await expect(page.getByRole('heading', { name: '新しい予定' })).not.toBeVisible();
+    await expect(helper.newScheduleHeading).not.toBeVisible();
   });
 
-  test('モバイルでテキストエリアにスクロールなしで入力できる', async ({ page }) => {
-    // FABボタンをタップ
-    await page.getByRole('button', { name: '予定を追加' }).tap();
-
-    // 説明フィールドに入力
-    const descriptionTextarea = page.getByLabel('説明');
-    await descriptionTextarea.fill(
-      'これはモバイルでの説明文入力テストです。\n複数行の入力も可能です。'
-    );
-
-    // 値が正しく入力されていることを確認
-    await expect(descriptionTextarea).toHaveValue(
-      'これはモバイルでの説明文入力テストです。\n複数行の入力も可能です。'
-    );
-  });
-
-  test('モバイルで長いタイトルが適切に表示される', async ({ page }) => {
-    // FABボタンをタップ
-    await page.getByRole('button', { name: '予定を追加' }).tap();
-
-    // 長いタイトルを入力
+  test('モバイルで長いタイトルが画面幅を超えない', async ({ page }) => {
     const longTitle =
       'これは非常に長いタイトルです。モバイル画面でも正しく表示されることを確認します。';
-    await page.getByLabel('タイトル *').fill(longTitle);
-    await page.getByLabel('開始時刻').selectOption('10:00');
-    await page.getByLabel('終了時刻').selectOption('11:00');
 
-    // 追加
-    await page.locator('.modal-content .btn-submit').tap();
+    await helper.addScheduleByTap({
+      title: longTitle,
+      startTime: '10:00',
+      endTime: '11:00',
+    });
 
-    // スケジュールが表示される
-    const scheduleItem = page.locator('.schedule-item', { hasText: longTitle });
+    const scheduleItem = helper.getScheduleItem(longTitle);
     await expect(scheduleItem).toBeVisible();
 
-    // アイテムが画面幅を超えていないことを確認
     const itemBox = await scheduleItem.boundingBox();
     const viewportSize = page.viewportSize();
 
@@ -349,29 +204,5 @@ test.describe('モバイル/レスポンシブテスト', () => {
     if (itemBox && viewportSize) {
       expect(itemBox.width).toBeLessThanOrEqual(viewportSize.width);
     }
-  });
-
-  test('スクリーンショットを取得してモバイル表示を確認', async ({ page }) => {
-    // 初期状態のスクリーンショット
-    await page.screenshot({ path: 'e2e/screenshots/mobile-initial.png' });
-
-    // スケジュールを追加
-    await page.getByRole('button', { name: '予定を追加' }).tap();
-
-    // フォーム表示時のスクリーンショット
-    await page.screenshot({ path: 'e2e/screenshots/mobile-form.png' });
-
-    await page.getByLabel('タイトル *').fill('スクリーンショットテスト');
-    await page.getByLabel('開始時刻').selectOption('10:00');
-    await page.getByLabel('終了時刻').selectOption('11:00');
-    await page.locator('.modal-content .btn-submit').tap();
-
-    // スケジュール追加後のスクリーンショット
-    await page.screenshot({ path: 'e2e/screenshots/mobile-with-schedule.png' });
-
-    // スケジュールが表示されていることを確認
-    await expect(
-      page.locator('.schedule-item .schedule-title', { hasText: 'スクリーンショットテスト' })
-    ).toBeVisible();
   });
 });
