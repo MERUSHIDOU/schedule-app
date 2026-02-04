@@ -1,5 +1,6 @@
 import type { Schedule } from '../types/schedule';
 import { formatDateLabel } from '../utils/date';
+import { getHolidaySchedules } from '../utils/holidays';
 import { hasMoreThanLines } from '../utils/textUtils';
 import './ScheduleList.css';
 
@@ -8,13 +9,27 @@ interface ScheduleListProps {
   selectedDate: string;
   onEdit: (schedule: Schedule) => void;
   onDelete: (id: string) => void;
+  showHolidays?: boolean;
 }
 
 // 予定一覧
-export function ScheduleList({ schedules, selectedDate, onEdit, onDelete }: ScheduleListProps) {
-  const filteredSchedules = schedules
+export function ScheduleList({
+  schedules,
+  selectedDate,
+  onEdit,
+  onDelete,
+  showHolidays = false,
+}: ScheduleListProps) {
+  // 祝日Scheduleを取得
+  const holidaySchedules = showHolidays ? getHolidaySchedules(selectedDate) : [];
+
+  // 通常の予定を時刻順にソート
+  const userSchedules = schedules
     .filter(s => s.date === selectedDate)
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+  // 祝日を最上部に、その後に通常予定を配置
+  const filteredSchedules = [...holidaySchedules, ...userSchedules];
 
   return (
     <div className="schedule-list">
@@ -27,9 +42,11 @@ export function ScheduleList({ schedules, selectedDate, onEdit, onDelete }: Sche
             <li key={schedule.id} className="schedule-item">
               <div className="schedule-color-bar" style={{ backgroundColor: schedule.color }} />
               <div className="schedule-content">
-                <div className="schedule-time">
-                  {schedule.startTime} - {schedule.endTime}
-                </div>
+                {!schedule.isHoliday && (
+                  <div className="schedule-time">
+                    {schedule.startTime} - {schedule.endTime}
+                  </div>
+                )}
                 <h4 className="schedule-title">{schedule.title}</h4>
                 {schedule.description && (
                   <p
@@ -39,28 +56,30 @@ export function ScheduleList({ schedules, selectedDate, onEdit, onDelete }: Sche
                   </p>
                 )}
               </div>
-              <div className="schedule-actions">
-                <button
-                  className="action-btn edit-btn"
-                  onClick={() => onEdit(schedule)}
-                  aria-label="編集"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                  </svg>
-                </button>
-                <button
-                  className="action-btn delete-btn"
-                  onClick={() => onDelete(schedule.id)}
-                  aria-label="削除"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="3 6 5 6 21 6" />
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                  </svg>
-                </button>
-              </div>
+              {!schedule.isHoliday && (
+                <div className="schedule-actions">
+                  <button
+                    className="action-btn edit-btn"
+                    onClick={() => onEdit(schedule)}
+                    aria-label="編集"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                  </button>
+                  <button
+                    className="action-btn delete-btn"
+                    onClick={() => onDelete(schedule.id)}
+                    aria-label="削除"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </li>
           ))}
         </ul>

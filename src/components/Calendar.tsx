@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useSwipe } from '../hooks/useSwipe';
 import type { Schedule } from '../types/schedule';
 import { formatDate, getMonthDays, getMonthName, isToday } from '../utils/date';
-import { getHolidayName } from '../utils/holidays';
+import { getHolidayName, getHolidaySchedules } from '../utils/holidays';
 import './Calendar.css';
 
 interface CalendarProps {
@@ -13,6 +13,61 @@ interface CalendarProps {
 }
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
+
+// カレンダーの1日分を表示するコンポーネント
+interface CalendarDayProps {
+  date: Date;
+  month: number;
+  selectedDate: string;
+  daySchedules: Schedule[];
+  showHolidays: boolean;
+  onSelectDate: (date: string) => void;
+}
+
+function CalendarDay({
+  date,
+  month,
+  selectedDate,
+  daySchedules,
+  showHolidays,
+  onSelectDate,
+}: CalendarDayProps) {
+  const dateStr = formatDate(date);
+  const isCurrentMonth = date.getMonth() === month;
+  const isSunday = date.getDay() === 0;
+  const isSaturday = date.getDay() === 6;
+  const holidayName = showHolidays ? getHolidayName(dateStr) : null;
+  const isHoliday = holidayName !== null;
+
+  return (
+    <button
+      type="button"
+      className={`calendar-day ${!isCurrentMonth ? 'other-month' : ''} ${
+        isToday(date) ? 'today' : ''
+      } ${selectedDate === dateStr ? 'selected' : ''} ${
+        isSunday ? 'sunday' : ''
+      } ${isSaturday ? 'saturday' : ''} ${isHoliday ? 'holiday' : ''}`}
+      onClick={() => onSelectDate(dateStr)}
+      data-date={dateStr}
+    >
+      <span className="day-number">{date.getDate()}</span>
+      {daySchedules.length > 0 && (
+        <div className="schedule-dots">
+          {daySchedules.slice(0, 3).map(schedule => (
+            <span
+              key={schedule.id}
+              className="schedule-dot"
+              style={{ backgroundColor: schedule.color }}
+            />
+          ))}
+          {daySchedules.length > 3 && (
+            <span className="more-indicator">+{daySchedules.length - 3}</span>
+          )}
+        </div>
+      )}
+    </button>
+  );
+}
 
 // 月間カレンダー表示
 export function Calendar({
@@ -52,12 +107,20 @@ export function Calendar({
   );
 
   /**
-   * 指定された日付のスケジュールを取得
+   * 指定された日付のスケジュールを取得（祝日を含む）
    * @param date
    * @returns
    */
   const getSchedulesForDay = (date: Date) => {
-    return schedules.filter(s => s.date === formatDate(date));
+    const dateStr = formatDate(date);
+    const userSchedules = schedules.filter(s => s.date === dateStr);
+
+    if (showHolidays) {
+      const holidaySchedules = getHolidaySchedules(dateStr);
+      return [...holidaySchedules, ...userSchedules];
+    }
+
+    return userSchedules;
   };
 
   return (
@@ -95,46 +158,17 @@ export function Calendar({
         onTouchMove={e => swipeHandlers.onTouchMove(e.nativeEvent)}
         onTouchEnd={e => swipeHandlers.onTouchEnd(e.nativeEvent)}
       >
-        {days.map((date, index) => {
-          const dateStr = formatDate(date);
-          const daySchedules = getSchedulesForDay(date);
-          const isCurrentMonth = date.getMonth() === month;
-          const isSunday = date.getDay() === 0;
-          const isSaturday = date.getDay() === 6;
-          const holidayName = showHolidays ? getHolidayName(dateStr) : null;
-          const isHoliday = holidayName !== null;
-
-          return (
-            <button
-              type="button"
-              key={index}
-              className={`calendar-day ${!isCurrentMonth ? 'other-month' : ''} ${
-                isToday(date) ? 'today' : ''
-              } ${selectedDate === dateStr ? 'selected' : ''} ${
-                isSunday ? 'sunday' : ''
-              } ${isSaturday ? 'saturday' : ''} ${isHoliday ? 'holiday' : ''}`}
-              onClick={() => onSelectDate(dateStr)}
-              data-date={dateStr}
-            >
-              <span className="day-number">{date.getDate()}</span>
-              {holidayName && <span className="holiday-name">{holidayName}</span>}
-              {daySchedules.length > 0 && (
-                <div className="schedule-dots">
-                  {daySchedules.slice(0, 3).map(schedule => (
-                    <span
-                      key={schedule.id}
-                      className="schedule-dot"
-                      style={{ backgroundColor: schedule.color }}
-                    />
-                  ))}
-                  {daySchedules.length > 3 && (
-                    <span className="more-indicator">+{daySchedules.length - 3}</span>
-                  )}
-                </div>
-              )}
-            </button>
-          );
-        })}
+        {days.map((date, index) => (
+          <CalendarDay
+            key={index}
+            date={date}
+            month={month}
+            selectedDate={selectedDate}
+            daySchedules={getSchedulesForDay(date)}
+            showHolidays={showHolidays}
+            onSelectDate={onSelectDate}
+          />
+        ))}
       </div>
     </div>
   );

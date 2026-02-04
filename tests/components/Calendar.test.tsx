@@ -8,10 +8,13 @@ describe('Calendar', () => {
     {
       id: '1',
       title: 'テストスケジュール1',
+      description: '',
       date: '2026-01-15',
       startTime: '10:00',
       endTime: '11:00',
       color: '#3b82f6',
+      createdAt: '',
+      updatedAt: '',
     },
   ];
 
@@ -375,8 +378,8 @@ describe('Calendar', () => {
   });
 
   describe('祝日表示機能', () => {
-    it('showHolidaysがtrueの時に祝日名が表示されること', () => {
-      render(
+    it('showHolidaysがtrueの時に祝日がドットとして表示されること', () => {
+      const { container } = render(
         <Calendar
           schedules={mockSchedules}
           selectedDate="2026-01-01"
@@ -385,12 +388,20 @@ describe('Calendar', () => {
         />
       );
 
-      // 元日が表示されていることを確認
-      expect(screen.getByText('元日')).toBeInTheDocument();
+      // 1月1日のセルを取得
+      const holidayCell = container.querySelector('[data-date="2026-01-01"]');
+      expect(holidayCell).toBeInTheDocument();
+
+      // 祝日名テキストが表示されていないことを確認
+      expect(screen.queryByText('元日')).not.toBeInTheDocument();
+
+      // ドットが表示されていることを確認
+      const dots = holidayCell?.querySelectorAll('.schedule-dot');
+      expect(dots).toHaveLength(1);
     });
 
-    it('showHolidaysがfalseの時に祝日名が非表示であること', () => {
-      render(
+    it('showHolidaysがfalseの時に祝日ドットが非表示であること', () => {
+      const { container } = render(
         <Calendar
           schedules={mockSchedules}
           selectedDate="2026-01-01"
@@ -399,12 +410,19 @@ describe('Calendar', () => {
         />
       );
 
-      // 元日が表示されていないことを確認
+      // 1月1日のセルを取得
+      const holidayCell = container.querySelector('[data-date="2026-01-01"]');
+
+      // ドットが表示されていないことを確認
+      const dots = holidayCell?.querySelectorAll('.schedule-dot');
+      expect(dots).toHaveLength(0);
+
+      // 祝日名テキストも表示されていないことを確認
       expect(screen.queryByText('元日')).not.toBeInTheDocument();
     });
 
     it('showHolidaysが未指定の時にデフォルトでtrueとして動作すること', () => {
-      render(
+      const { container } = render(
         <Calendar
           schedules={mockSchedules}
           selectedDate="2026-01-01"
@@ -412,8 +430,25 @@ describe('Calendar', () => {
         />
       );
 
-      // デフォルトで祝日が表示されることを確認
-      expect(screen.getByText('元日')).toBeInTheDocument();
+      // デフォルトで祝日ドットが表示されることを確認
+      const holidayCell = container.querySelector('[data-date="2026-01-01"]');
+      const dots = holidayCell?.querySelectorAll('.schedule-dot');
+      expect(dots).toHaveLength(1);
+    });
+
+    it('祝日のドットが赤色（#e74c3c）であること', () => {
+      const { container } = render(
+        <Calendar
+          schedules={mockSchedules}
+          selectedDate="2026-01-01"
+          onSelectDate={mockOnSelectDate}
+          showHolidays={true}
+        />
+      );
+
+      const holidayCell = container.querySelector('[data-date="2026-01-01"]');
+      const dot = holidayCell?.querySelector('.schedule-dot');
+      expect(dot).toHaveStyle({ backgroundColor: '#e74c3c' });
     });
 
     it('祝日の日にholidayクラスが付与されること', () => {
@@ -446,6 +481,37 @@ describe('Calendar', () => {
       const normalCell = container.querySelector('[data-date="2026-01-02"]');
       expect(normalCell).toHaveClass('calendar-day');
       expect(normalCell).not.toHaveClass('holiday');
+    });
+
+    it('祝日と通常の予定が混在する場合、両方のドットが表示されること', () => {
+      const schedulesWithHoliday: Schedule[] = [
+        {
+          id: '1',
+          title: 'テスト予定',
+          description: '',
+          date: '2026-01-01',
+          startTime: '10:00',
+          endTime: '11:00',
+          color: '#3b82f6',
+          createdAt: '',
+          updatedAt: '',
+        },
+      ];
+
+      const { container } = render(
+        <Calendar
+          schedules={schedulesWithHoliday}
+          selectedDate="2026-01-01"
+          onSelectDate={mockOnSelectDate}
+          showHolidays={true}
+        />
+      );
+
+      const holidayCell = container.querySelector('[data-date="2026-01-01"]');
+      const dots = holidayCell?.querySelectorAll('.schedule-dot');
+
+      // 祝日ドット（赤）+ 通常予定ドット（青）= 2つ
+      expect(dots).toHaveLength(2);
     });
   });
 });

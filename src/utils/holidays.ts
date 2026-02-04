@@ -1,4 +1,7 @@
 import { holidays } from '../data/holidays';
+import type { Schedule } from '../types/schedule';
+
+const HOLIDAY_COLOR = '#e74c3c';
 
 /**
  * 指定した日付の祝日名を取得する
@@ -42,4 +45,52 @@ export function getHolidaysInMonth(year: number, month: number): Record<string, 
   });
 
   return result;
+}
+
+/**
+ * 指定した日付の祝日をScheduleオブジェクトとして取得する
+ * @param dateStr - YYYY-MM-DD形式の日付文字列
+ * @returns 祝日のSchedule配列（祝日でない場合は空配列）
+ */
+export function getHolidaySchedules(dateStr: string): Schedule[] {
+  const name = getHolidayName(dateStr);
+  if (!name) return [];
+
+  return [
+    {
+      id: `holiday-${dateStr}`,
+      title: name,
+      description: '',
+      date: dateStr,
+      startTime: '00:00',
+      endTime: '23:59',
+      color: HOLIDAY_COLOR,
+      createdAt: '',
+      updatedAt: '',
+      isHoliday: true,
+    },
+  ];
+}
+
+/**
+ * 指定した年月の祝日をScheduleオブジェクトの配列として取得する
+ * @param year - 年（例: 2024）
+ * @param month - 月（1-12）
+ * @returns 祝日のSchedule配列
+ */
+export function getHolidaySchedulesInMonth(year: number, month: number): Schedule[] {
+  const holidaysInMonth = getHolidaysInMonth(year, month);
+
+  return Object.keys(holidaysInMonth).map(dateStr => ({
+    id: `holiday-${dateStr}`,
+    title: holidaysInMonth[dateStr],
+    description: '',
+    date: dateStr,
+    startTime: '00:00',
+    endTime: '23:59',
+    color: HOLIDAY_COLOR,
+    createdAt: '',
+    updatedAt: '',
+    isHoliday: true,
+  }));
 }

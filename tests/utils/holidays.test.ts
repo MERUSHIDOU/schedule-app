@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { getHolidayName, getHolidaysInMonth, isHoliday } from '../../src/utils/holidays';
+import {
+  getHolidayName,
+  getHolidaySchedules,
+  getHolidaySchedulesInMonth,
+  getHolidaysInMonth,
+  isHoliday,
+} from '../../src/utils/holidays';
 
 describe('holidays utils', () => {
   describe('getHolidayName', () => {
@@ -90,6 +96,99 @@ describe('holidays utils', () => {
     it('無効な月（13）で空オブジェクトを返すこと', () => {
       const result = getHolidaysInMonth(2024, 13);
       expect(result).toEqual({});
+    });
+  });
+
+  describe('getHolidaySchedules', () => {
+    it('祝日の日付でScheduleオブジェクトを返すこと', () => {
+      const result = getHolidaySchedules('2024-01-01');
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual({
+        id: 'holiday-2024-01-01',
+        title: '元日',
+        description: '',
+        date: '2024-01-01',
+        startTime: '00:00',
+        endTime: '23:59',
+        color: '#e74c3c',
+        createdAt: '',
+        updatedAt: '',
+        isHoliday: true,
+      });
+    });
+
+    it('祝日でない日付で空配列を返すこと', () => {
+      const result = getHolidaySchedules('2024-01-02');
+      expect(result).toEqual([]);
+    });
+
+    it('範囲外の年で空配列を返すこと', () => {
+      const result = getHolidaySchedules('2023-01-01');
+      expect(result).toEqual([]);
+    });
+
+    it('IDが正しい形式であること', () => {
+      const result = getHolidaySchedules('2024-02-11');
+      expect(result[0].id).toBe('holiday-2024-02-11');
+    });
+
+    it('カラーが#e74c3cであること', () => {
+      const result = getHolidaySchedules('2024-01-01');
+      expect(result[0].color).toBe('#e74c3c');
+    });
+
+    it('isHolidayフラグがtrueであること', () => {
+      const result = getHolidaySchedules('2024-01-01');
+      expect(result[0].isHoliday).toBe(true);
+    });
+  });
+
+  describe('getHolidaySchedulesInMonth', () => {
+    it('2024年1月の祝日Scheduleを返すこと', () => {
+      const result = getHolidaySchedulesInMonth(2024, 1);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('holiday-2024-01-01');
+      expect(result[0].title).toBe('元日');
+      expect(result[1].id).toBe('holiday-2024-01-08');
+      expect(result[1].title).toBe('成人の日');
+    });
+
+    it('2024年5月の祝日Schedule（複数）を返すこと', () => {
+      const result = getHolidaySchedulesInMonth(2024, 5);
+
+      expect(result).toHaveLength(4);
+      expect(result.map(s => s.title)).toEqual([
+        '憲法記念日',
+        'みどりの日',
+        'こどもの日',
+        'こどもの日 振替休日',
+      ]);
+    });
+
+    it('祝日がない月で空配列を返すこと', () => {
+      const result = getHolidaySchedulesInMonth(2024, 6);
+      expect(result).toEqual([]);
+    });
+
+    it('すべての要素がisHoliday=trueであること', () => {
+      const result = getHolidaySchedulesInMonth(2024, 1);
+      result.forEach(schedule => {
+        expect(schedule.isHoliday).toBe(true);
+      });
+    });
+
+    it('すべての要素のカラーが#e74c3cであること', () => {
+      const result = getHolidaySchedulesInMonth(2024, 1);
+      result.forEach(schedule => {
+        expect(schedule.color).toBe('#e74c3c');
+      });
+    });
+
+    it('無効な月で空配列を返すこと', () => {
+      const result = getHolidaySchedulesInMonth(2024, 0);
+      expect(result).toEqual([]);
     });
   });
 });

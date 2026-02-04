@@ -9,6 +9,7 @@ export interface Schedule {
   color: string;
   createdAt: string;
   updatedAt: string;
+  isHoliday?: boolean;
 }
 
 // スケジュール編集フォームで取り扱う

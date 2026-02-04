@@ -10,10 +10,13 @@ describe('ScheduleList', () => {
   const createSchedule = (overrides?: Partial<Schedule>): Schedule => ({
     id: '1',
     title: 'テストスケジュール',
+    description: '',
     date: '2024-01-01',
     startTime: '09:00',
     endTime: '10:00',
     color: '#3b82f6',
+    createdAt: '',
+    updatedAt: '',
     ...overrides,
   });
 
@@ -202,6 +205,172 @@ describe('ScheduleList', () => {
 
       const dateLabel = screen.getByText('2024/06/15');
       expect(dateLabel).toBeInTheDocument();
+    });
+  });
+
+  describe('祝日表示', () => {
+    it('showHolidaysがtrueの場合、祝日が最上部に表示される', () => {
+      const schedules = [
+        createSchedule({ id: '1', title: '通常予定', startTime: '09:00', endTime: '10:00' }),
+      ];
+
+      const { container } = render(
+        <ScheduleList
+          schedules={schedules}
+          selectedDate="2024-01-01"
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          showHolidays={true}
+        />
+      );
+
+      const items = container.querySelectorAll('.schedule-item');
+      expect(items.length).toBe(2); // 祝日 + 通常予定
+
+      // 最初のアイテムが祝日（元日）
+      expect(items[0].textContent).toContain('元日');
+      // 2番目が通常予定
+      expect(items[1].textContent).toContain('通常予定');
+    });
+
+    it('showHolidaysがfalseの場合、祝日が表示されない', () => {
+      const schedules = [createSchedule({ id: '1', title: '通常予定', date: '2024-01-01' })];
+
+      const { container } = render(
+        <ScheduleList
+          schedules={schedules}
+          selectedDate="2024-01-01"
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          showHolidays={false}
+        />
+      );
+
+      const items = container.querySelectorAll('.schedule-item');
+      expect(items.length).toBe(1); // 通常予定のみ
+
+      expect(screen.queryByText('元日')).not.toBeInTheDocument();
+    });
+
+    it('祝日に時間表記が表示されない', () => {
+      const { container } = render(
+        <ScheduleList
+          schedules={[]}
+          selectedDate="2024-01-01"
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          showHolidays={true}
+        />
+      );
+
+      const items = container.querySelectorAll('.schedule-item');
+      expect(items.length).toBe(1); // 祝日のみ
+
+      const timeElement = items[0].querySelector('.schedule-time');
+      expect(timeElement).toBeNull();
+    });
+
+    it('祝日に編集ボタンが表示されない', () => {
+      const { container } = render(
+        <ScheduleList
+          schedules={[]}
+          selectedDate="2024-01-01"
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          showHolidays={true}
+        />
+      );
+
+      const items = container.querySelectorAll('.schedule-item');
+      const editBtn = items[0].querySelector('.edit-btn');
+      expect(editBtn).toBeNull();
+    });
+
+    it('祝日に削除ボタンが表示されない', () => {
+      const { container } = render(
+        <ScheduleList
+          schedules={[]}
+          selectedDate="2024-01-01"
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          showHolidays={true}
+        />
+      );
+
+      const items = container.querySelectorAll('.schedule-item');
+      const deleteBtn = items[0].querySelector('.delete-btn');
+      expect(deleteBtn).toBeNull();
+    });
+
+    it('祝日のカラーバーが赤色（#e74c3c）である', () => {
+      const { container } = render(
+        <ScheduleList
+          schedules={[]}
+          selectedDate="2024-01-01"
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          showHolidays={true}
+        />
+      );
+
+      const items = container.querySelectorAll('.schedule-item');
+      const colorBar = items[0].querySelector('.schedule-color-bar') as HTMLElement;
+      expect(colorBar).toHaveStyle({ backgroundColor: '#e74c3c' });
+    });
+
+    it('祝日のみの日に「予定がありません」が表示されない', () => {
+      render(
+        <ScheduleList
+          schedules={[]}
+          selectedDate="2024-01-01"
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          showHolidays={true}
+        />
+      );
+
+      expect(screen.queryByText('予定がありません')).not.toBeInTheDocument();
+      expect(screen.getByText('元日')).toBeInTheDocument();
+    });
+
+    it('祝日と通常予定が混在する場合、祝日が先に表示される', () => {
+      const schedules = [
+        createSchedule({ id: '1', title: '午前の予定', startTime: '09:00', endTime: '10:00' }),
+        createSchedule({ id: '2', title: '午後の予定', startTime: '14:00', endTime: '15:00' }),
+      ];
+
+      const { container } = render(
+        <ScheduleList
+          schedules={schedules}
+          selectedDate="2024-01-01"
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          showHolidays={true}
+        />
+      );
+
+      const items = container.querySelectorAll('.schedule-item');
+      expect(items.length).toBe(3); // 祝日 + 2つの通常予定
+
+      // 最初が祝日
+      expect(items[0].textContent).toContain('元日');
+      // 次が時刻順の通常予定
+      expect(items[1].textContent).toContain('午前の予定');
+      expect(items[2].textContent).toContain('午後の予定');
+    });
+
+    it('showHolidaysが未指定の場合、祝日が表示されない（デフォルト動作）', () => {
+      const { container } = render(
+        <ScheduleList
+          schedules={[]}
+          selectedDate="2024-01-01"
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+        />
+      );
+
+      expect(screen.queryByText('元日')).not.toBeInTheDocument();
+      expect(screen.getByText('予定がありません')).toBeInTheDocument();
     });
   });
 });
