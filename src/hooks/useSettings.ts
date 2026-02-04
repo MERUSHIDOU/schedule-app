@@ -1,19 +1,17 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { AppSettings } from '../types/schedule';
-import { loadSettings, saveSettings } from '../utils/storage';
+import { loadSettings } from '../utils/storage';
 
 /**
  * アプリケーション設定を管理するカスタムフック
+ * 設定項目がなくなったため、空オブジェクトを返すのみ
  */
 export function useSettings() {
-  const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
+  const [settings] = useState<AppSettings>(() => loadSettings());
 
-  useEffect(() => {
-    saveSettings(settings);
-  }, [settings]);
-
-  const updateSettings = useCallback((newSettings: AppSettings) => {
-    setSettings(newSettings);
+  // 設定項目がなくなったため、更新機能は無効化
+  const updateSettings = useCallback((_newSettings: AppSettings) => {
+    // 何もしない
   }, []);
 
   return {

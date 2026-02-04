@@ -9,7 +9,6 @@ interface CalendarProps {
   schedules: Schedule[];
   selectedDate: string;
   onSelectDate: (date: string) => void;
-  showHolidays?: boolean;
 }
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
@@ -20,23 +19,15 @@ interface CalendarDayProps {
   month: number;
   selectedDate: string;
   daySchedules: Schedule[];
-  showHolidays: boolean;
   onSelectDate: (date: string) => void;
 }
 
-function CalendarDay({
-  date,
-  month,
-  selectedDate,
-  daySchedules,
-  showHolidays,
-  onSelectDate,
-}: CalendarDayProps) {
+function CalendarDay({ date, month, selectedDate, daySchedules, onSelectDate }: CalendarDayProps) {
   const dateStr = formatDate(date);
   const isCurrentMonth = date.getMonth() === month;
   const isSunday = date.getDay() === 0;
   const isSaturday = date.getDay() === 6;
-  const holidayName = showHolidays ? getHolidayName(dateStr) : null;
+  const holidayName = getHolidayName(dateStr);
   const isHoliday = holidayName !== null;
 
   return (
@@ -70,12 +61,7 @@ function CalendarDay({
 }
 
 // 月間カレンダー表示
-export function Calendar({
-  schedules,
-  selectedDate,
-  onSelectDate,
-  showHolidays = true,
-}: CalendarProps) {
+export function Calendar({ schedules, selectedDate, onSelectDate }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(() => {
     return selectedDate ? new Date(selectedDate) : new Date();
   });
@@ -114,13 +100,8 @@ export function Calendar({
   const getSchedulesForDay = (date: Date) => {
     const dateStr = formatDate(date);
     const userSchedules = schedules.filter(s => s.date === dateStr);
-
-    if (showHolidays) {
-      const holidaySchedules = getHolidaySchedules(dateStr);
-      return [...holidaySchedules, ...userSchedules];
-    }
-
-    return userSchedules;
+    const holidaySchedules = getHolidaySchedules(dateStr);
+    return [...holidaySchedules, ...userSchedules];
   };
 
   return (
@@ -165,7 +146,6 @@ export function Calendar({
             month={month}
             selectedDate={selectedDate}
             daySchedules={getSchedulesForDay(date)}
-            showHolidays={showHolidays}
             onSelectDate={onSelectDate}
           />
         ))}

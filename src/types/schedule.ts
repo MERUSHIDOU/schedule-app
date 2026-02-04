@@ -26,6 +26,4 @@ export interface ScheduleFormData {
 export type ViewMode = 'month' | 'week' | 'day';
 
 // アプリケーション設定
-export interface AppSettings {
-  showHolidays: boolean;
-}
+export type AppSettings = {};

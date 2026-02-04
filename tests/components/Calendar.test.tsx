@@ -378,13 +378,12 @@ describe('Calendar', () => {
   });
 
   describe('祝日表示機能', () => {
-    it('showHolidaysがtrueの時に祝日がドットとして表示されること', () => {
+    it('祝日が常にドットとして表示されること', () => {
       const { container } = render(
         <Calendar
           schedules={mockSchedules}
           selectedDate="2026-01-01"
           onSelectDate={mockOnSelectDate}
-          showHolidays={true}
         />
       );
 
@@ -400,49 +399,12 @@ describe('Calendar', () => {
       expect(dots).toHaveLength(1);
     });
 
-    it('showHolidaysがfalseの時に祝日ドットが非表示であること', () => {
-      const { container } = render(
-        <Calendar
-          schedules={mockSchedules}
-          selectedDate="2026-01-01"
-          onSelectDate={mockOnSelectDate}
-          showHolidays={false}
-        />
-      );
-
-      // 1月1日のセルを取得
-      const holidayCell = container.querySelector('[data-date="2026-01-01"]');
-
-      // ドットが表示されていないことを確認
-      const dots = holidayCell?.querySelectorAll('.schedule-dot');
-      expect(dots).toHaveLength(0);
-
-      // 祝日名テキストも表示されていないことを確認
-      expect(screen.queryByText('元日')).not.toBeInTheDocument();
-    });
-
-    it('showHolidaysが未指定の時にデフォルトでtrueとして動作すること', () => {
-      const { container } = render(
-        <Calendar
-          schedules={mockSchedules}
-          selectedDate="2026-01-01"
-          onSelectDate={mockOnSelectDate}
-        />
-      );
-
-      // デフォルトで祝日ドットが表示されることを確認
-      const holidayCell = container.querySelector('[data-date="2026-01-01"]');
-      const dots = holidayCell?.querySelectorAll('.schedule-dot');
-      expect(dots).toHaveLength(1);
-    });
-
     it('祝日のドットが赤色（#e74c3c）であること', () => {
       const { container } = render(
         <Calendar
           schedules={mockSchedules}
           selectedDate="2026-01-01"
           onSelectDate={mockOnSelectDate}
-          showHolidays={true}
         />
       );
 
@@ -457,7 +419,6 @@ describe('Calendar', () => {
           schedules={mockSchedules}
           selectedDate="2026-01-01"
           onSelectDate={mockOnSelectDate}
-          showHolidays={true}
         />
       );
 
@@ -473,7 +434,6 @@ describe('Calendar', () => {
           schedules={mockSchedules}
           selectedDate="2026-01-02"
           onSelectDate={mockOnSelectDate}
-          showHolidays={true}
         />
       );
 
@@ -503,7 +463,6 @@ describe('Calendar', () => {
           schedules={schedulesWithHoliday}
           selectedDate="2026-01-01"
           onSelectDate={mockOnSelectDate}
-          showHolidays={true}
         />
       );
 

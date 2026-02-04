@@ -141,12 +141,12 @@ describe('ScheduleList', () => {
 
   describe('レイアウト', () => {
     it('説明の追加後も既存のレイアウトが保持される', () => {
-      const schedules = [createSchedule({ description: '説明' })];
+      const schedules = [createSchedule({ description: '説明', date: '2024-01-02' })];
 
       const { container } = render(
         <ScheduleList
           schedules={schedules}
-          selectedDate="2024-01-01"
+          selectedDate="2024-01-02"
           onEdit={mockOnEdit}
           onDelete={mockOnDelete}
         />
@@ -209,7 +209,7 @@ describe('ScheduleList', () => {
   });
 
   describe('祝日表示', () => {
-    it('showHolidaysがtrueの場合、祝日が最上部に表示される', () => {
+    it('祝日が常に最上部に表示される', () => {
       const schedules = [
         createSchedule({ id: '1', title: '通常予定', startTime: '09:00', endTime: '10:00' }),
       ];
@@ -220,7 +220,6 @@ describe('ScheduleList', () => {
           selectedDate="2024-01-01"
           onEdit={mockOnEdit}
           onDelete={mockOnDelete}
-          showHolidays={true}
         />
       );
 
@@ -233,25 +232,6 @@ describe('ScheduleList', () => {
       expect(items[1].textContent).toContain('通常予定');
     });
 
-    it('showHolidaysがfalseの場合、祝日が表示されない', () => {
-      const schedules = [createSchedule({ id: '1', title: '通常予定', date: '2024-01-01' })];
-
-      const { container } = render(
-        <ScheduleList
-          schedules={schedules}
-          selectedDate="2024-01-01"
-          onEdit={mockOnEdit}
-          onDelete={mockOnDelete}
-          showHolidays={false}
-        />
-      );
-
-      const items = container.querySelectorAll('.schedule-item');
-      expect(items.length).toBe(1); // 通常予定のみ
-
-      expect(screen.queryByText('元日')).not.toBeInTheDocument();
-    });
-
     it('祝日に時間表記が表示されない', () => {
       const { container } = render(
         <ScheduleList
@@ -259,7 +239,6 @@ describe('ScheduleList', () => {
           selectedDate="2024-01-01"
           onEdit={mockOnEdit}
           onDelete={mockOnDelete}
-          showHolidays={true}
         />
       );
 
@@ -277,7 +256,6 @@ describe('ScheduleList', () => {
           selectedDate="2024-01-01"
           onEdit={mockOnEdit}
           onDelete={mockOnDelete}
-          showHolidays={true}
         />
       );
 
@@ -293,7 +271,6 @@ describe('ScheduleList', () => {
           selectedDate="2024-01-01"
           onEdit={mockOnEdit}
           onDelete={mockOnDelete}
-          showHolidays={true}
         />
       );
 
@@ -309,7 +286,6 @@ describe('ScheduleList', () => {
           selectedDate="2024-01-01"
           onEdit={mockOnEdit}
           onDelete={mockOnDelete}
-          showHolidays={true}
         />
       );
 
@@ -325,7 +301,6 @@ describe('ScheduleList', () => {
           selectedDate="2024-01-01"
           onEdit={mockOnEdit}
           onDelete={mockOnDelete}
-          showHolidays={true}
         />
       );
 
@@ -345,7 +320,6 @@ describe('ScheduleList', () => {
           selectedDate="2024-01-01"
           onEdit={mockOnEdit}
           onDelete={mockOnDelete}
-          showHolidays={true}
         />
       );
 
@@ -357,20 +331,6 @@ describe('ScheduleList', () => {
       // 次が時刻順の通常予定
       expect(items[1].textContent).toContain('午前の予定');
       expect(items[2].textContent).toContain('午後の予定');
-    });
-
-    it('showHolidaysが未指定の場合、祝日が表示されない（デフォルト動作）', () => {
-      const { container } = render(
-        <ScheduleList
-          schedules={[]}
-          selectedDate="2024-01-01"
-          onEdit={mockOnEdit}
-          onDelete={mockOnDelete}
-        />
-      );
-
-      expect(screen.queryByText('元日')).not.toBeInTheDocument();
-      expect(screen.getByText('予定がありません')).toBeInTheDocument();
     });
   });
 });

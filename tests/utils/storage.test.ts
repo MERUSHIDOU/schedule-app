@@ -102,34 +102,23 @@ describe('loadSettings', () => {
     localStorage.clear();
   });
 
-  it('デフォルト値を返すこと', () => {
+  it('空の設定オブジェクトを返すこと', () => {
     const result = loadSettings();
-    expect(result).toEqual({ showHolidays: true });
+    expect(result).toEqual({});
   });
 
-  it('保存済みデータが正しく読み込まれること', () => {
+  it('localStorageに設定があっても空オブジェクトを返すこと', () => {
     localStorage.setItem('schedule-app-settings', JSON.stringify({ showHolidays: false }));
 
     const result = loadSettings();
-    expect(result).toEqual({ showHolidays: false });
+    expect(result).toEqual({});
   });
 
-  it('不正なデータの場合デフォルト値にフォールバックすること', () => {
+  it('不正なデータの場合も空オブジェクトを返すこと', () => {
     localStorage.setItem('schedule-app-settings', 'invalid json');
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const result = loadSettings();
-    expect(result).toEqual({ showHolidays: true });
-    expect(consoleSpy).toHaveBeenCalled();
-
-    consoleSpy.mockRestore();
-  });
-
-  it('不完全なデータの場合デフォルト値にフォールバックすること', () => {
-    localStorage.setItem('schedule-app-settings', JSON.stringify({}));
-
-    const result = loadSettings();
-    expect(result).toEqual({ showHolidays: true });
+    expect(result).toEqual({});
   });
 });
 
@@ -138,17 +127,10 @@ describe('saveSettings', () => {
     localStorage.clear();
   });
 
-  it('正しく保存されること', () => {
-    saveSettings({ showHolidays: false });
+  it('何も保存しないこと', () => {
+    saveSettings({});
 
     const saved = localStorage.getItem('schedule-app-settings');
-    expect(saved).toBe(JSON.stringify({ showHolidays: false }));
-  });
-
-  it('デフォルト値を保存できること', () => {
-    saveSettings({ showHolidays: true });
-
-    const saved = localStorage.getItem('schedule-app-settings');
-    expect(saved).toBe(JSON.stringify({ showHolidays: true }));
+    expect(saved).toBeNull();
   });
 });

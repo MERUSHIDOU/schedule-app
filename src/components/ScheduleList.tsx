@@ -9,19 +9,12 @@ interface ScheduleListProps {
   selectedDate: string;
   onEdit: (schedule: Schedule) => void;
   onDelete: (id: string) => void;
-  showHolidays?: boolean;
 }
 
 // 予定一覧
-export function ScheduleList({
-  schedules,
-  selectedDate,
-  onEdit,
-  onDelete,
-  showHolidays = false,
-}: ScheduleListProps) {
-  // 祝日Scheduleを取得
-  const holidaySchedules = showHolidays ? getHolidaySchedules(selectedDate) : [];
+export function ScheduleList({ schedules, selectedDate, onEdit, onDelete }: ScheduleListProps) {
+  // 祝日Scheduleを取得（常に表示）
+  const holidaySchedules = getHolidaySchedules(selectedDate);
 
   // 通常の予定を時刻順にソート
   const userSchedules = schedules
