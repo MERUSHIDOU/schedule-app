@@ -22,15 +22,15 @@
 
 **すべての変更はgit worktreeを使用し、Pull Requestで提出すること。**
 
-```bash
-# worktree作成（tmux統合機能付き推奨）
-npm run worktree:new -- <type> <name> --task "タスク説明"
+新機能の実装は`/implement`スキルを使用：
 
-# 変更の提出
-/ship  # コミット、プッシュ、PR作成を自動化
+```bash
+/implement [実装したい機能の説明]
 ```
 
-**詳細:** `.claude/rules/workflow.md`
+このスキルが自動的にブランチ作成、worktree設定、タスク委譲を行います。
+
+詳細: `.claude/commands/implement.md`、`.claude/rules/workflow.md`
 
 ## プロジェクト概要
 
@@ -57,15 +57,7 @@ npm run preview  # ビルド結果プレビュー
 
 ## 開発ワークフロー（必須）
 
-**指示出しからPR作成までの標準フローは `.claude/rules/development-workflow.md` を参照。**
-
-主要なステップ：
-1. アーキテクチャ設計（条件付き）- architect
-2. 実装計画策定 - `/plan`
-3. 実装 - `/tdd`
-4. コードレビュー（必須）- `/code-review`
-5. セキュリティレビュー（条件付き）- `/security-review`
-6. PR作成 - `/ship`
+新機能の実装は`/implement`スキルを使用。複雑さに応じて自動的に計画→実装→レビュー→PRまでのワークフローが実行されます。
 
 詳細: `.claude/rules/development-workflow.md`
 
