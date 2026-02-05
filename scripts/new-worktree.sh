@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Git Worktree作成スクリプト
-# 使い方: ./scripts/new-worktree.sh <type> <name> [--task "description"]
-# 例: ./scripts/new-worktree.sh feat new-feature --task "新機能の説明"
+# 使い方: ./scripts/new-worktree.sh <type> <name> [--prompt "description"]
+# 例: ./scripts/new-worktree.sh feat new-feature --prompt "新機能の説明"
 
 set -e
 
 # 引数チェック
 if [ $# -lt 2 ]; then
     echo "エラー: 引数が不足しています"
-    echo "使い方: npm run worktree:new <type> <name> [--task \"description\"]"
+    echo "使い方: npm run worktree:new <type> <name> [--prompt \"description\"]"
     echo ""
     echo "利用可能なtype:"
     echo "  feat      - 新機能"
@@ -19,20 +19,26 @@ if [ $# -lt 2 ]; then
     echo "  test      - テスト追加"
     echo "  chore     - ビルド・設定"
     echo ""
-    echo "例: npm run worktree:new feat new-feature --task \"新機能の説明\""
+    echo "例: npm run worktree:new feat new-feature --prompt \"新機能の説明\""
     exit 1
 fi
 
 TYPE=$1
 NAME=$2
-TASK_DESCRIPTION=""
+PROMPT_TEXT=""
 
 # オプション引数の解析
 shift 2
 while [[ $# -gt 0 ]]; do
     case $1 in
+        --prompt)
+            PROMPT_TEXT="$2"
+            shift 2
+            ;;
         --task)
-            TASK_DESCRIPTION="$2"
+            # 後方互換性のため --task も受け付ける（非推奨）
+            echo "警告: --task オプションは非推奨です。--prompt を使用してください。"
+            PROMPT_TEXT="$2"
             shift 2
             ;;
         *)
@@ -135,20 +141,12 @@ echo ""
 echo "4. 依存関係をインストール..."
 cd "${WORKTREE_DIR}"
 npm install
-
-# タスクコンテキストファイルを生成
-echo ""
-echo "5. タスクコンテキストファイルを生成..."
 cd - > /dev/null  # 元のディレクトリに戻る
-bash scripts/create-worktree-context.sh \
-    "${WORKTREE_DIR}" \
-    "${BRANCH_NAME}" \
-    "${TASK_DESCRIPTION}"
 
 # tmux統合処理
 if [ -n "$TMUX" ]; then
     echo ""
-    echo "6. tmux paneを作成してClaudeを起動..."
+    echo "5. tmux paneを作成してClaudeを起動..."
     echo ""
 
     # 新しいpaneを作成（水平分割、worktreeディレクトリで開始）
@@ -160,11 +158,8 @@ if [ -n "$TMUX" ]; then
         echo "  cd ${WORKTREE_DIR}"
         echo "  claude"
     else
-        # メインプロジェクトの絶対パス（コンテキストファイル参照用）
-        MAIN_PROJECT_DIR=$(cd "$(pwd)" && pwd)
-
         # 1. Claudeをフォアグラウンドで起動
-        # --add-dirで現在のworktreeとメインプロジェクトを追加
+        # --add-dirで現在のworktreeを追加
         tmux send-keys -t "$PANE_ID" "claude --add-dir ." C-m
 
         # 2. Claudeの起動完了を待つ
@@ -173,18 +168,17 @@ if [ -n "$TMUX" ]; then
         tmux send-keys -t "$PANE_ID" C-m
         sleep 1
 
-        # 3. コンテキストファイルの内容を読み込み
-        CONTEXT_CONTENT=$(cat "${WORKTREE_DIR}/.claude/worktree-context.md")
+        # 3. プロンプトが指定されている場合は送信
+        if [ -n "$PROMPT_TEXT" ]; then
+            # プロンプトをClaudeに送信（フォアグラウンドで起動しているため受信可能）
+            tmux send-keys -t "$PANE_ID" "$PROMPT_TEXT"
+            sleep 1
+            tmux send-keys -t "$PANE_ID" C-m
 
-        # 4. タスクプロンプトを作成
-        PROMPT=$'以下のタスクを実施してください：\n\n'"${CONTEXT_CONTENT}"
-
-        # 5. プロンプトをClaudeに送信（フォアグラウンドで起動しているため受信可能）
-        tmux send-keys -t "$PANE_ID" "$PROMPT"
-        sleep 1
-        tmux send-keys -t "$PANE_ID" C-m
-
-        echo "✓ 新しいpaneでClaudeが起動し、タスクコンテキストを送信しました"
+            echo "✓ 新しいpaneでClaudeが起動し、プロンプトを送信しました"
+        else
+            echo "✓ 新しいpaneでClaudeが起動しました"
+        fi
         echo ""
         echo "Pane情報: ${PANE_ID}"
     fi
@@ -196,7 +190,7 @@ else
     echo ""
     echo "tmux統合機能を使用する場合は、tmuxセッション内で実行してください:"
     echo "  tmux"
-    echo "  npm run worktree:new ${TYPE} ${NAME} --task \"タスク説明\""
+    echo "  npm run worktree:new ${TYPE} ${NAME} --prompt \"プロンプトテキスト\""
     echo ""
 fi
 

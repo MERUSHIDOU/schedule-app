@@ -2,6 +2,33 @@
 
 ## フロー全体
 
+### パターンA: /implementスキル使用（推奨）
+
+```
+ユーザー: /implement [機能]
+      ↓
+メインClaude:
+  1. ブランチ名決定
+  2. 複雑さ判断
+  3. npm run worktree:new -- <type> <name> --prompt "<プロンプト>"
+     - シンプル: プロンプト = "[機能]"
+     - 複雑: プロンプト = "/plan [機能]"
+  4. 終了
+      ↓
+新セッションClaude:
+  [シンプル]              [複雑]
+      ↓                      ↓
+  /tdd で実装          /plan で計画策定
+      ↓                      ↓
+  /code-review         承認後 /tdd
+      ↓                      ↓
+  [セキュリティ?] → Yes → /security-review
+      ↓ No                   ↓
+  /ship                  /code-review → /ship
+```
+
+### パターンB: 直接実装（従来）
+
 ```
 指示 → [建築的判断必要?] → Yes → architect → ADR/設計
                           ↓ No
@@ -91,6 +118,24 @@
 ```
 
 ## ワークフロー例
+
+### /implementスキル使用（推奨）
+
+**簡単な機能追加:**
+```
+ユーザー: /implement ログアウトボタンを追加
+→ メインClaude: ブランチ決定、worktree作成、プロンプト送信、終了
+→ 新セッションClaude: /tdd → /code-review → /ship
+```
+
+**複雑な機能追加:**
+```
+ユーザー: /implement ユーザー認証システムを追加
+→ メインClaude: ブランチ決定、worktree作成、/plan付きプロンプト送信、終了
+→ 新セッションClaude: /plan → 承認 → /tdd → /code-review → /security-review → /ship
+```
+
+### 直接実装（従来）
 
 **簡単な機能追加:**
 ```
