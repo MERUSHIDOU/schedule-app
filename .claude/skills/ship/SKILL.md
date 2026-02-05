@@ -1,3 +1,9 @@
+---
+name: ship
+description: 現在の変更をコミットしてプッシュし、Pull Requestを作成する統合スキル
+model: haiku
+---
+
 # ship
 
 現在の変更をコミットしてプッシュし、Pull Requestを作成する統合スキル。
@@ -47,9 +53,12 @@
 
 ### 4. Pull Request作成
 
-- commit messageとdiffからPRのタイトルと説明を生成
-- `gh pr create` でPRを作成
-- PR URLを返す
+- 現在のブランチに既存のPRがあるかチェック
+- **既存のPRがある場合**: PR作成をスキップし、Push完了を通知
+- **既存のPRがない場合**:
+  - commit messageとdiffからPRのタイトルと説明を生成
+  - `gh pr create` でPRを作成
+  - PR URLを返す
 
 ## Commit Message形式
 
@@ -107,6 +116,7 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 - **テスト実行**: 重要な変更の場合は、事前にテストを実行してください
 - **pre-commit hooks**: hooksが設定されている場合は自動実行されます
 - **コンフリクト**: ベースブランチの更新が必要な場合は手動で解決してください
+- **既存PRがある場合**: 既にPRが存在するブランチでは、コミットとPushまで実行し、PR作成はスキップされます
 
 ## トラブルシューティング
 
