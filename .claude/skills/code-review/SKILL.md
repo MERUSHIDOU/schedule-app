@@ -364,32 +364,32 @@ const activeUsers = users.filter(user => user.isActive)
 ## レビューレポート形式
 
 ```markdown
-## Code Review Report
+## コードレビューレポート
 
-### Summary
-- Total files reviewed: X
-- Critical issues: X
-- High issues: X
-- Medium issues: X
-- Low issues: X
+### 概要
+- レビューしたファイル総数: X
+- 重大な問題: X
+- 高い問題: X
+- 中程度の問題: X
+- 低い問題: X
 
-### Critical Issues (Must Fix)
-1. **[Security]** `path/to/file.ts:42`
-   - Issue: ハードコードされたAPIキー
-   - Suggestion: 環境変数を使用
+### 重大な問題（必ず修正）
+1. **[セキュリティ]** `path/to/file.ts:42`
+   - 問題: ハードコードされたAPIキー
+   - 提案: 環境変数を使用
 
-### High Issues (Should Fix)
-1. **[Quality]** `path/to/file.tsx:128`
-   - Issue: 関数が75行を超えている
-   - Suggestion: 責務を分割して複数の関数に
+### 高い問題（修正すべき）
+1. **[品質]** `path/to/file.tsx:128`
+   - 問題: 関数が75行を超えている
+   - 提案: 責務を分割して複数の関数に
 
-### Medium Issues (Consider Fixing)
+### 中程度の問題（修正を検討）
 ...
 
-### Low Issues (Nice to Have)
+### 低い問題（あれば良い）
 ...
 
-### Positive Observations
+### 良い点
 - 適切なエラーハンドリングが実装されている
 - テストカバレッジが十分
 ```
