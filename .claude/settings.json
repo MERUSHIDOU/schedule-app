@@ -5,22 +5,22 @@
       "Read",
       "Write",
       "Edit",
+      "Skill",
       "WebFetch",
+      "WebSearch",
       "mcp__github__get_file_contents",
       "mcp__github__create_issue",
-      "Skill(register-github-issue)",
       "Bash(npm run:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(gh pr:*)",
+      "Bash(npm test:*)",
+      "Bash(gh issue view:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx playwright test:*)"
     ],
-    "deny": [
-      "Bash(rm *)",
-      "Bash(*rm -*)",
-      "Bash(rmdir *)",
-      "Bash(*rmdir *)",
-      "Bash(* rm *)",
-      "Bash(git rm *)",
-      "Bash(*git rm *)"
-    ],
+    "deny": ["Bash(sudo:*)"],
     "ask": [
       "Bash(git commit:*)",
       "Bash(git commit -m *)",
@@ -31,7 +31,14 @@
       "Bash(* && git commit -m:*)",
       "mcp__github__create_pull_request",
       "mcp__github__create_or_update_file",
-      "mcp__github__push_files"
+      "mcp__github__push_files",
+      "Bash(rm *)",
+      "Bash(*rm -*)",
+      "Bash(rmdir *)",
+      "Bash(*rmdir *)",
+      "Bash(* rm *)",
+      "Bash(git rm *)",
+      "Bash(*git rm *)"
     ]
   },
   "enableAllProjectMcpServers": true,
