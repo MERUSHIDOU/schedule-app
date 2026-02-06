@@ -196,6 +196,5 @@ npm run worktree:new -- <type> <name> --prompt "<プロンプト>"
 
 ## 関連ドキュメント
 
-- Git Workflow: `.claude/rules/workflow.md`
-- Development Workflow: `.claude/rules/development-workflow.md`
-- Agents & Skills: `.claude/rules/agents.md`
+- Development Workflow: @.claude/rules/workflow.md
+- Agents & Skills: @.claude/rules/agents.md
