@@ -259,8 +259,5 @@ REDフェーズをスキップしないでください。テストの前にコ�
 
 ## 関連エージェント
 
-このコマンドは以下の`tdd-guide`エージェントを起動します:
-`~/.claude/agents/tdd-guide.md`
-
-また、以下の`tdd-workflow`スキルを参照できます:
-`~/.claude/skills/tdd-workflow/`
+このコマンドは以下の`tdd-guide`エージェントを起動します: @.claude/agents/tdd-guide.md
+また、以下の`tdd-workflow`スキルを参照できます: @.claude/skills/tdd-workflow/

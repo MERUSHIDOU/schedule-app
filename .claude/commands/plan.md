@@ -143,5 +143,4 @@ plannerエージェントが以下を実行：
 
 ## 関連エージェント
 
-このコマンドは `planner` エージェントを起動：
-`~/.claude/agents/planner.md`
+このコマンドは `planner` エージェントを起動： @.claude/agents/planner.md
