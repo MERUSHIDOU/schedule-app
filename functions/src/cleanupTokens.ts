@@ -34,7 +34,14 @@ async function cleanupExpiredFcmTokens(db: admin.firestore.Firestore, now: Date)
   const usersSnap = await db.collection('users').get();
   let deletedCount = 0;
 
-  const batch = db.batch();
+  // Firestore のバッチ更新 (500件制限)
+  const BATCH_SIZE = 500;
+  const docsWithUpdates: Array<{
+    ref: admin.firestore.DocumentReference;
+    updates: Record<string, admin.firestore.FieldValue>;
+    count: number;
+  }> = [];
+
   for (const userDoc of usersSnap.docs) {
     const userData = userDoc.data();
     const fcmTokens = (userData.fcmTokens ?? {}) as Record<
@@ -51,12 +58,19 @@ async function cleanupExpiredFcmTokens(db: admin.firestore.Firestore, now: Date)
       for (const deviceId of expiredDeviceIds) {
         updates[`fcmTokens.${deviceId}`] = admin.firestore.FieldValue.delete();
       }
-      batch.update(userDoc.ref, updates);
+      docsWithUpdates.push({ ref: userDoc.ref, updates, count: expiredDeviceIds.length });
       deletedCount += expiredDeviceIds.length;
     }
   }
 
-  await batch.commit();
+  for (let i = 0; i < docsWithUpdates.length; i += BATCH_SIZE) {
+    const batch = db.batch();
+    for (const { ref, updates } of docsWithUpdates.slice(i, i + BATCH_SIZE)) {
+      batch.update(ref, updates);
+    }
+    await batch.commit();
+  }
+
   logger.info(
     `期限切れFCMトークンを削除: ${deletedCount}件 (${FCM_TOKEN_EXPIRY_DAYS}日以上未更新)`
   );

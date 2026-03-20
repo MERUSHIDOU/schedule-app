@@ -111,75 +111,80 @@ export const sendPush = onRequest({ region: 'asia-northeast1' }, async (req, res
     return;
   }
 
-  const db = admin.firestore();
-  const reminderRef = db.collection('reminders').doc(reminderId);
-  const reminderSnap = await reminderRef.get();
+  try {
+    const db = admin.firestore();
+    const reminderRef = db.collection('reminders').doc(reminderId);
+    const reminderSnap = await reminderRef.get();
 
-  if (!reminderSnap.exists) {
-    logger.warn(`リマインダーが存在しません: ${reminderId}`);
-    res.status(200).send('ok');
-    return;
-  }
+    if (!reminderSnap.exists) {
+      logger.warn(`リマインダーが存在しません: ${reminderId}`);
+      res.status(200).send('ok');
+      return;
+    }
 
-  const reminder = reminderSnap.data() as ReminderDoc;
-  if (reminder.status === 'cancelled' || reminder.status === 'sent') {
-    logger.info(`リマインダー ${reminderId} はすでに ${reminder.status} です`);
-    res.status(200).send('ok');
-    return;
-  }
+    const reminder = reminderSnap.data() as ReminderDoc;
+    if (reminder.status === 'cancelled' || reminder.status === 'sent') {
+      logger.info(`リマインダー ${reminderId} はすでに ${reminder.status} です`);
+      res.status(200).send('ok');
+      return;
+    }
 
-  const userRef = db.collection('users').doc(reminder.userId);
-  const userSnap = await userRef.get();
+    const userRef = db.collection('users').doc(reminder.userId);
+    const userSnap = await userRef.get();
 
-  if (!userSnap.exists) {
-    logger.warn(`ユーザーが存在しません: ${reminder.userId}`);
-    await updateReminderStatus(reminderRef, false, 'ユーザードキュメントが存在しません');
-    res.status(200).send('ok');
-    return;
-  }
+    if (!userSnap.exists) {
+      logger.warn(`ユーザーが存在しません: ${reminder.userId}`);
+      await updateReminderStatus(reminderRef, false, 'ユーザードキュメントが存在しません');
+      res.status(200).send('ok');
+      return;
+    }
 
-  const userData = userSnap.data() ?? {};
-  const fcmTokensMap = (userData.fcmTokens ?? {}) as Record<string, FcmTokenInfo>;
-  const tokens = Object.values(fcmTokensMap).map(info => info.token);
+    const userData = userSnap.data() ?? {};
+    const fcmTokensMap = (userData.fcmTokens ?? {}) as Record<string, FcmTokenInfo>;
+    const tokens = Object.values(fcmTokensMap).map(info => info.token);
 
-  if (tokens.length === 0) {
-    logger.warn(`FCMトークンがありません: userId=${reminder.userId}`);
-    await updateReminderStatus(reminderRef, false, 'FCMトークンが登録されていません');
-    res.status(200).send('ok');
-    return;
-  }
+    if (tokens.length === 0) {
+      logger.warn(`FCMトークンがありません: userId=${reminder.userId}`);
+      await updateReminderStatus(reminderRef, false, 'FCMトークンが登録されていません');
+      res.status(200).send('ok');
+      return;
+    }
 
-  const result = await sendPushNotification({
-    tokens,
-    title: reminder.title,
-    body: reminder.body,
-    data: {
-      scheduleId: reminder.scheduleId,
-      reminderId,
-      click_action: '/schedule-app/',
-    },
-  });
+    const result = await sendPushNotification({
+      tokens,
+      title: reminder.title,
+      body: reminder.body,
+      data: {
+        scheduleId: reminder.scheduleId,
+        reminderId,
+        click_action: '/schedule-app/',
+      },
+    });
 
-  logger.info(
-    `FCM送信結果: reminderId=${reminderId}, ` +
-      `success=${result.successCount}, failure=${result.failureCount}`
-  );
-
-  if (result.invalidTokens.length > 0) {
-    await removeInvalidTokens(userRef, fcmTokensMap, result.invalidTokens);
-  }
-
-  if (result.successCount > 0) {
-    await updateReminderStatus(reminderRef, true);
-  } else {
-    await updateReminderStatus(
-      reminderRef,
-      false,
-      `全トークンへの送信失敗 (failure=${result.failureCount})`
+    logger.info(
+      `FCM送信結果: reminderId=${reminderId}, ` +
+        `success=${result.successCount}, failure=${result.failureCount}`
     );
-    res.status(500).send('全トークンへの送信に失敗しました');
-    return;
-  }
 
-  res.status(200).send('ok');
+    if (result.invalidTokens.length > 0) {
+      await removeInvalidTokens(userRef, fcmTokensMap, result.invalidTokens);
+    }
+
+    if (result.successCount > 0) {
+      await updateReminderStatus(reminderRef, true);
+    } else {
+      await updateReminderStatus(
+        reminderRef,
+        false,
+        `全トークンへの送信失敗 (failure=${result.failureCount})`
+      );
+      res.status(500).send('全トークンへの送信に失敗しました');
+      return;
+    }
+
+    res.status(200).send('ok');
+  } catch (err) {
+    logger.error('sendPush ハンドラで予期しないエラーが発生しました', err);
+    res.status(500).json({ error: '内部サーバーエラーが発生しました' });
+  }
 });
