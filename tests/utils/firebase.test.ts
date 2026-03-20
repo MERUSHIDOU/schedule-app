@@ -14,6 +14,11 @@ vi.mock('firebase/firestore', () => ({
   getFirestore: vi.fn(() => ({})),
 }));
 
+vi.mock('firebase/messaging', () => ({
+  getMessaging: vi.fn(() => ({ app: { name: '[DEFAULT]' } })),
+  isSupported: vi.fn(() => Promise.resolve(true)),
+}));
+
 describe('firebase初期化', () => {
   it('appがエクスポートされること', async () => {
     const { app } = await import('../../src/utils/firebase');
@@ -57,5 +62,19 @@ describe('firebase初期化', () => {
     // 再インポートしても二重初期化しない（モジュールキャッシュ）
     const { app } = await import('../../src/utils/firebase');
     expect(app).toBeDefined();
+  });
+
+  it('messagingがエクスポートされること', async () => {
+    const { messaging } = await import('../../src/utils/firebase');
+    // messaging は非同期初期化のため null またはオブジェクト
+    expect(messaging === null || typeof messaging === 'object').toBe(true);
+  });
+});
+
+describe('isFirebaseConfigured', () => {
+  it('環境変数が設定されているとき true を返す', async () => {
+    const { isFirebaseConfigured } = await import('../../src/utils/firebase');
+    // vite.config.ts のテスト環境変数で設定済み
+    expect(isFirebaseConfigured()).toBe(true);
   });
 });

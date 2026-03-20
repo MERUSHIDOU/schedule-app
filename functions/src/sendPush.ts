@@ -1,7 +1,34 @@
 import * as admin from 'firebase-admin';
 import * as logger from 'firebase-functions/logger';
 import { onRequest } from 'firebase-functions/v2/https';
+import { OAuth2Client } from 'google-auth-library';
 import { sendPushNotification } from './utils/fcm.js';
+
+const authClient = new OAuth2Client();
+
+/**
+ * Cloud Tasks から送られてくる OIDC トークンを検証する。
+ * Cloud Tasks は Authorization: Bearer <OIDC token> ヘッダーを付与する。
+ * トークンのメールアドレスが Cloud Tasks サービスアカウントと一致することを確認する。
+ */
+async function verifyCloudTasksToken(authHeader: string | undefined): Promise<void> {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new Error('Authorization ヘッダーがありません');
+  }
+  const token = authHeader.slice(7);
+  const audience = process.env.SEND_PUSH_URL ?? '';
+
+  const ticket = await authClient.verifyIdToken({ idToken: token, audience });
+  const payload = ticket.getPayload();
+  if (!payload) {
+    throw new Error('トークンのペイロードが取得できません');
+  }
+
+  const expectedEmail = process.env.SERVICE_ACCOUNT_EMAIL ?? '';
+  if (expectedEmail && payload.email !== expectedEmail) {
+    throw new Error(`サービスアカウントが一致しません: ${payload.email}`);
+  }
+}
 
 interface ReminderDoc {
   userId: string;
@@ -65,6 +92,15 @@ async function removeInvalidTokens(
 export const sendPush = onRequest({ region: 'asia-northeast1' }, async (req, res) => {
   if (req.method !== 'POST') {
     res.status(405).send('Method Not Allowed');
+    return;
+  }
+
+  // Cloud Tasks からの正規リクエストであることを OIDC トークンで検証
+  try {
+    await verifyCloudTasksToken(req.headers.authorization);
+  } catch (err) {
+    logger.warn('OIDC トークン検証失敗', err);
+    res.status(401).send('Unauthorized');
     return;
   }
 
