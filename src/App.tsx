@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { Calendar } from './components/Calendar';
+import { FCMPermissionBanner } from './components/FCMPermissionBanner';
 import { ScheduleForm } from './components/ScheduleForm';
 import { ScheduleList } from './components/ScheduleList';
 import { VersionInfo } from './components/VersionInfo';
+import { useCloudReminder } from './hooks/useCloudReminder';
+import { useFCM } from './hooks/useFCM';
+import { useFirebaseAuth } from './hooks/useFirebaseAuth';
 import { useSchedules } from './hooks/useSchedules';
 import type { Schedule, ScheduleFormData } from './types/schedule';
 import { formatDate } from './utils/date';
@@ -13,6 +17,18 @@ function App() {
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
+
+  // Firebase 匿名認証
+  const { userId } = useFirebaseAuth();
+  // FCM トークン管理
+  const fcmResult = useFCM(userId);
+  // Cloud リマインダー CRUD
+  const {
+    createReminder,
+    cancelReminder,
+    updateReminder,
+    loading: isReminderLoading,
+  } = useCloudReminder();
 
   // 予定追加ボタンを押したとき
   const handleAddClick = () => {
@@ -29,20 +45,54 @@ function App() {
   };
 
   // 既存スケジュールの削除ボタンを押したとき
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     // 祝日は削除不可（防御的プログラミング）
     if (id.startsWith('holiday-')) return;
     if (window.confirm('この予定を削除しますか？')) {
+      const schedule = schedules.find(s => s.id === id);
+      if (schedule?.reminderId) {
+        await cancelReminder(schedule.reminderId);
+      }
       deleteSchedule(id);
     }
   };
 
   // スケジュール作成フォームで追加ボタンを押したとき
-  const handleFormSubmit = (data: ScheduleFormData) => {
+  const handleFormSubmit = async (data: ScheduleFormData) => {
     if (editingSchedule) {
       updateSchedule(editingSchedule.id, data);
+      // 編集時のリマインダー更新
+      const updatedSchedule: Schedule = {
+        ...editingSchedule,
+        ...data,
+        updatedAt: new Date().toISOString(),
+      };
+      if (updatedSchedule.reminder && updatedSchedule.reminder !== 'none') {
+        const reminderId = await updateReminder(updatedSchedule);
+        if (reminderId) {
+          updateSchedule(editingSchedule.id, { ...data, reminderId } as ScheduleFormData & {
+            reminderId: string;
+          });
+        }
+      } else if (editingSchedule.reminderId) {
+        // リマインダーが「なし」に変更された場合はキャンセル
+        await cancelReminder(editingSchedule.reminderId);
+        updateSchedule(editingSchedule.id, {
+          ...data,
+          reminderId: undefined,
+        } as ScheduleFormData & { reminderId: undefined });
+      }
     } else {
-      addSchedule(data);
+      const newSchedule = addSchedule(data);
+      // 新規作成時のリマインダー登録
+      if (newSchedule.reminder && newSchedule.reminder !== 'none') {
+        const reminderId = await createReminder(newSchedule);
+        if (reminderId) {
+          updateSchedule(newSchedule.id, { ...data, reminderId } as ScheduleFormData & {
+            reminderId: string;
+          });
+        }
+      }
     }
   };
 
@@ -58,6 +108,8 @@ function App() {
         <h1>スケジュール</h1>
         <VersionInfo />
       </header>
+
+      <FCMPermissionBanner schedules={schedules} useFCMResult={fcmResult} />
 
       <main className="app-main">
         <Calendar
@@ -87,6 +139,7 @@ function App() {
         selectedDate={selectedDate}
         onClose={handleFormClose}
         onSubmit={handleFormSubmit}
+        isReminderLoading={isReminderLoading}
       />
     </div>
   );

@@ -8,6 +8,7 @@ interface ScheduleFormProps {
   selectedDate: string;
   onClose: () => void;
   onSubmit: (data: ScheduleFormData) => void;
+  isReminderLoading?: boolean;
 }
 
 const COLORS = [
@@ -64,6 +65,7 @@ export function ScheduleForm({
   selectedDate,
   onClose,
   onSubmit,
+  isReminderLoading = false,
 }: ScheduleFormProps) {
   const [formData, setFormData] = useState<ScheduleFormData>(initialFormData);
   const [timeError, setTimeError] = useState<string>('');
@@ -260,8 +262,12 @@ export function ScheduleForm({
             <button type="button" className="btn-cancel" onClick={onClose}>
               キャンセル
             </button>
-            <button type="submit" className="btn-submit" disabled={!!timeError}>
-              {schedule ? '更新' : '追加'}
+            <button
+              type="submit"
+              className="btn-submit"
+              disabled={!!timeError || isReminderLoading}
+            >
+              {isReminderLoading ? '保存中...' : schedule ? '更新' : '追加'}
             </button>
           </div>
         </form>

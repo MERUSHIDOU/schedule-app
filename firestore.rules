@@ -1,0 +1,21 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ユーザーは自分のドキュメントのみ読み書き可能
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // リマインダーは自分のもののみ読み書き可能
+    match /reminders/{reminderId} {
+      // 作成: 認証済み、かつ自分のuserIdを設定する場合のみ
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid;
+
+      // 読み取り・更新・削除: 認証済み、かつ自分のリマインダーのみ
+      allow read, update, delete: if request.auth != null
+        && resource.data.userId == request.auth.uid;
+    }
+  }
+}

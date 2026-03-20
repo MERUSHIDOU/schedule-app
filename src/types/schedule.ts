@@ -1,3 +1,14 @@
+// リマインダータイミング
+export type ReminderTiming =
+  | 'none'
+  | 'atStart'
+  | '5min'
+  | '10min'
+  | '15min'
+  | '30min'
+  | '1hour'
+  | '1day';
+
 // スケジュールデータ
 export interface Schedule {
   id: string;
@@ -10,6 +21,8 @@ export interface Schedule {
   createdAt: string;
   updatedAt: string;
   isHoliday?: boolean;
+  reminder?: ReminderTiming;
+  reminderId?: string;
 }
 
 // スケジュール編集フォームで取り扱う

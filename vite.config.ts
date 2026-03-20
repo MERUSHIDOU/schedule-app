@@ -24,6 +24,14 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     include: ['tests/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+    env: {
+      VITE_FIREBASE_API_KEY: 'test-api-key',
+      VITE_FIREBASE_AUTH_DOMAIN: 'test.firebaseapp.com',
+      VITE_FIREBASE_PROJECT_ID: 'test-project-id',
+      VITE_FIREBASE_STORAGE_BUCKET: 'test.appspot.com',
+      VITE_FIREBASE_MESSAGING_SENDER_ID: '123456789',
+      VITE_FIREBASE_APP_ID: '1:123456789:web:abcdef',
+    },
   },
   base: '/schedule-app/',
   plugins: [
@@ -62,6 +70,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        navigateFallbackDenylist: [/firebase-messaging-sw\.js/],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

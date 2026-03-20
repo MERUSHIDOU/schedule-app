@@ -1,0 +1,62 @@
+.fcm-permission-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #1e40af;
+  color: #ffffff;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1000;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.fcm-permission-banner__message {
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.fcm-permission-banner__ios-guide {
+  font-size: 12px;
+  color: #bfdbfe;
+  margin: 0;
+}
+
+.fcm-permission-banner__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.fcm-permission-banner__enable-btn {
+  background-color: #ffffff;
+  color: #1e40af;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fcm-permission-banner__enable-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.fcm-permission-banner__later-btn {
+  background-color: transparent;
+  color: #bfdbfe;
+  border: 1px solid #93c5fd;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
